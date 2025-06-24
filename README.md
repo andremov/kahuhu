@@ -1,28 +1,57 @@
-# Create T3 App
+# Kahoot Clone
 
-This is a [T3 Stack](https://create.t3.gg/) project bootstrapped with `create-t3-app`.
+This project is a clone of the popular quiz game Kahoot, built using Next.js and styled with Tailwind CSS. 
 
-## What's next? How do I make an app with this?
+## Features
 
-We try to keep this project as simple as possible, so you can start with just the scaffolding we set up for you, and add additional things later when they become necessary.
+- User-friendly interface for creating and participating in quizzes.
+- Real-time updates and interactions.
+- Responsive design for mobile and desktop users.
 
-If you are not familiar with the different technologies used in this project, please refer to the respective docs. If you still are in the wind, please join our [Discord](https://t3.gg/discord) and ask for help.
+## Getting Started
 
-- [Next.js](https://nextjs.org)
-- [NextAuth.js](https://next-auth.js.org)
-- [Prisma](https://prisma.io)
-- [Tailwind CSS](https://tailwindcss.com)
-- [tRPC](https://trpc.io)
+To get started with the project, follow these steps:
 
-## Learn More
+1. **Clone the repository:**
+   ```bash
+   git clone https://github.com/yourusername/kahoot-clone.git
+   cd kahoot-clone
+   ```
 
-To learn more about the [T3 Stack](https://create.t3.gg/), take a look at the following resources:
+2. **Install dependencies:**
+   ```bash
+   npm install
+   ```
 
-- [Documentation](https://create.t3.gg/)
-- [Learn the T3 Stack](https://create.t3.gg/en/faq#what-learning-resources-are-currently-available) — Check out these awesome tutorials
+3. **Run the development server:**
+   ```bash
+   npm run dev
+   ```
 
-You can check out the [create-t3-app GitHub repository](https://github.com/t3-oss/create-t3-app) — your feedback and contributions are welcome!
+4. **Open your browser and navigate to:**
+   ```
+   http://localhost:3000
+   ```
 
-## How do I deploy this?
+## Project Structure
 
-Follow our deployment guides for [Vercel](https://create.t3.gg/en/deployment/vercel), [Netlify](https://create.t3.gg/en/deployment/netlify) and [Docker](https://create.t3.gg/en/deployment/docker) for more information.
+- `src/components`: Contains reusable components like the Navbar.
+- `src/pages`: Contains the main pages of the application, including the index and quiz pages.
+- `src/styles`: Contains global and Tailwind CSS styles.
+- `src/utils`: Contains utility functions for API calls.
+- `public`: Contains static assets like images and icons.
+
+## Technologies Used
+
+- Next.js
+- React
+- Tailwind CSS
+- TypeScript
+
+## Contributing
+
+Contributions are welcome! Please open an issue or submit a pull request for any improvements or features you'd like to add.
+
+## License
+
+This project is licensed under the MIT License.
