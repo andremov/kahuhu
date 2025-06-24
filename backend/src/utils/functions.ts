@@ -3,7 +3,12 @@ import { Game } from './types';
 import { Temporal } from '@js-temporal/polyfill';
 import { getGameState } from '../services/games';
 
-export const calculateScore = (isCorrect, timeRemaining, totalTime, basePoints) => {
+export const calculateScore = (
+  isCorrect: boolean,
+  timeRemaining: number,
+  totalTime: number,
+  basePoints: number
+) => {
   if (!isCorrect) return 0;
 
   const timeBonus = Math.max(0, timeRemaining / totalTime);
