@@ -2,7 +2,11 @@ import { Server, Socket } from 'socket.io';
 import { getGameByCode, getPlayerBySocketId } from '../services/games';
 import { calculateScore, handleQuestionEnd } from '../utils/functions';
 
-export default function submitAnswerSocketEvent(io: Server, socket: Socket, { answerIndex }) {
+export default function submitAnswerSocketEvent(
+  io: Server,
+  socket: Socket,
+  { answerIndex }: { answerIndex: string }
+) {
   try {
     const player = getPlayerBySocketId(socket.id);
     if (!player) return;
@@ -13,11 +17,11 @@ export default function submitAnswerSocketEvent(io: Server, socket: Socket, { an
     if (!player || player.answers[game.currentQuestionIndex] !== null) return;
 
     // Record answer
-    player.answers[game.currentQuestionIndex] = answerIndex;
+    player.answers[game.currentQuestionIndex] = Number(answerIndex);
 
     // Calculate score
     const currentQuestion = game.quizData!.questions[game.currentQuestionIndex];
-    const isCorrect = answerIndex === currentQuestion.correctAnswer;
+    const isCorrect = Number(answerIndex) === currentQuestion.correctAnswer;
     const questionScore = calculateScore(isCorrect, game.timeRemaining, 60, currentQuestion.points);
 
     player.score += questionScore;

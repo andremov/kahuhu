@@ -1,16 +1,23 @@
-import js from "@eslint/js";
-import globals from "globals";
-import tseslint from "typescript-eslint";
+const tseslint = require('@typescript-eslint/eslint-plugin');
+const tsParser = require('@typescript-eslint/parser');
 
-export default tseslint.config(
-  { ignores: ["dist"] },
+module.exports = [
   {
-    extends: [js.configs.recommended, ...tseslint.configs.recommended],
-    files: ["**/*.{ts,tsx}"],
+    ignores: ['dist', 'node_modules'],
+  },
+  {
+    files: ['**/*.ts', '**/*.tsx'],
     languageOptions: {
-      ecmaVersion: 2020,
-      globals: globals.browser,
+      parser: tsParser,
+      ecmaVersion: 'latest',
+      sourceType: 'module',
     },
-    rules: {},
-  }
-);
+    plugins: {
+      '@typescript-eslint': tseslint,
+    },
+    rules: {
+      'no-console': 'off',
+      '@typescript-eslint/no-explicit-any': 'warn',
+    },
+  },
+];

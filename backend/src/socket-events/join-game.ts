@@ -1,7 +1,11 @@
 import { Server, Socket } from 'socket.io';
 import { getGameState, joinGame } from '../services/games';
 
-export default function joinGameSocketEvent(io: Server, socket: Socket, { gameCode, playerName }) {
+export default function joinGameSocketEvent(
+  io: Server,
+  socket: Socket,
+  { gameCode, playerName }: { gameCode: string; playerName: string }
+) {
   try {
     const result = joinGame(gameCode, playerName, socket.id);
 

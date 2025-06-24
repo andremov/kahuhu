@@ -9,15 +9,15 @@ import submitAnswerSocketEvent from './submit-answer';
 export default function onSocketConnection(io: Server, socket: Socket) {
   console.log('User connected:', socket.id);
 
-  socket.on('create-game', (quiz) => createGameSocketEvent(io, socket, quiz));
+  socket.on('create-game', (quizId: string) => createGameSocketEvent(io, socket, quizId));
 
-  socket.on('join-game', ({ gameCode, playerName }) =>
+  socket.on('join-game', ({ gameCode, playerName }: { gameCode: string; playerName: string }) =>
     joinGameSocketEvent(io, socket, { gameCode, playerName })
   );
 
   socket.on('start-game', () => startGameSocketEvent(io, socket));
 
-  socket.on('submit-answer', ({ answerIndex }) =>
+  socket.on('submit-answer', ({ answerIndex }: { answerIndex: string }) =>
     submitAnswerSocketEvent(io, socket, { answerIndex })
   );
 
