@@ -1,16 +1,33 @@
-import React, { useState } from 'react';
-import { Play, Plus, Users, Trophy } from 'lucide-react';
-import { Button } from '../ui/button';
-import { sampleQuizzes } from '../../data/sample-quizzes';
-import { Quiz } from '../../types';
+import { Plus, Trophy, HelpCircle } from 'lucide-react';
+import { Quiz } from '../../utils/types';
+import { useEffect, useState } from 'react';
+import { fetchQuizzes } from '../../utils/api';
+import { JoinForm } from '../forms/join-form';
 
 interface HomeScreenProps {
   onCreateGame: (quiz: Quiz) => void;
-  onJoinGame: () => void;
+  onCreateQuiz: () => void;
+  onJoinGame: (gameCode: string, playerName: string) => void;
+  error?: string | null;
 }
 
-export const HomeScreen: React.FC<HomeScreenProps> = ({ onCreateGame, onJoinGame }) => {
+export function HomeScreen({ onCreateGame, onJoinGame, error, onCreateQuiz }: HomeScreenProps) {
   const [selectedQuiz, setSelectedQuiz] = useState<Quiz | null>(null);
+  const [loadedQuizzes, setLoadedQuizzes] = useState<Quiz[]>([]);
+
+  useEffect(() => {
+    const callFetchQuizzes = async () => {
+      try {
+        const response = await fetchQuizzes();
+        setLoadedQuizzes(response);
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      } catch (error) {
+        // console.error('Error fetching quizzes:', error);
+      }
+    };
+
+    callFetchQuizzes();
+  }, []);
 
   const handleCreateGame = () => {
     if (selectedQuiz) {
@@ -27,19 +44,17 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onCreateGame, onJoinGame
             <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center shadow-lg">
               <Trophy className="w-7 h-7 text-purple-600" />
             </div>
-            <h1 className="text-4xl md:text-6xl font-bold text-white">
-              QuizMaster
-            </h1>
+            <h1 className="text-4xl md:text-6xl font-bold text-white">Kahuhu</h1>
           </div>
-          <p className="text-xl text-white/90 font-medium">
-            Create engaging quizzes and compete with friends in real-time!
-          </p>
         </div>
 
         {/* Main Actions */}
-        <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto mb-12">
+        <div className="grid md:grid-rows-1 gap-8 max-w-4xl mx-auto mb-12">
+          {/* Join Game */}
+          <JoinForm onJoinGame={onJoinGame} error={error} />
+
           {/* Host Game */}
-          <div className="bg-white/95 backdrop-blur-sm rounded-3xl p-8 shadow-2xl">
+          {/* <div className="bg-white/95 backdrop-blur-sm rounded-3xl p-8 shadow-2xl">
             <div className="text-center mb-6">
               <div className="w-16 h-16 bg-gradient-to-r from-purple-500 to-purple-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
                 <Plus className="w-8 h-8 text-white" />
@@ -50,7 +65,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onCreateGame, onJoinGame
 
             <div className="space-y-4 mb-6">
               <h3 className="font-semibold text-gray-800">Choose a Quiz:</h3>
-              {sampleQuizzes.map((quiz) => (
+              {loadedQuizzes.map((quiz) => (
                 <div
                   key={quiz.id}
                   onClick={() => setSelectedQuiz(quiz)}
@@ -65,7 +80,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onCreateGame, onJoinGame
                   <div className="flex items-center space-x-4 mt-2 text-xs text-gray-500">
                     <span>{quiz.questions.length} questions</span>
                     <span>•</span>
-                    <span>~{Math.ceil(quiz.questions.reduce((acc, q) => acc + q.timeLimit, 0) / 60)} min</span>
+                    <span>~{quiz.questions.length} min</span>
                   </div>
                 </div>
               ))}
@@ -80,64 +95,31 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ onCreateGame, onJoinGame
             >
               Create Game
             </Button>
-          </div>
-
-          {/* Join Game */}
-          <div className="bg-white/95 backdrop-blur-sm rounded-3xl p-8 shadow-2xl">
-            <div className="text-center mb-6">
-              <div className="w-16 h-16 bg-gradient-to-r from-pink-500 to-pink-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                <Users className="w-8 h-8 text-white" />
-              </div>
-              <h2 className="text-2xl font-bold text-gray-800 mb-2">Join a Game</h2>
-              <p className="text-gray-600">Enter a game code to join an existing session</p>
-            </div>
-
-            <div className="text-center">
-              <div className="mb-6">
-                <div className="w-32 h-32 bg-gradient-to-br from-pink-100 to-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <span className="text-4xl">🎮</span>
-                </div>
-                <p className="text-gray-600">Ready to play? Get the game code from your host!</p>
-              </div>
-
-              <Button
-                onClick={onJoinGame}
-                variant="warning"
-                size="lg"
-                icon={Users}
-                className="w-full"
-              >
-                Join Game
-              </Button>
-            </div>
-          </div>
+          </div> */}
         </div>
 
-        {/* Features */}
-        <div className="grid md:grid-cols-3 gap-6 max-w-4xl mx-auto">
-          <div className="text-center text-white">
-            <div className="w-12 h-12 bg-white/20 rounded-2xl flex items-center justify-center mx-auto mb-3">
-              <Play className="w-6 h-6" />
+        <div className="grid md:grid-cols-2 gap-4 max-w-lg mx-auto">
+          <button
+            className="group text-center text-white transition hover:scale-105 hover:bg-white/30 bg-transparent w-fit mx-auto p-6 rounded-3xl hover:shadow-lg select-none cursor-pointer"
+            onClick={onCreateGame}
+          >
+            <div className="w-12 h-12 bg-white/20 rounded-2xl flex items-center justify-center mx-auto mb-3 transition group-hover:bg-transparent">
+              <Plus className="w-6 h-6" />
             </div>
-            <h3 className="font-semibold mb-2">Real-time Gameplay</h3>
-            <p className="text-white/80 text-sm">Experience live quiz sessions with instant feedback</p>
-          </div>
-          <div className="text-center text-white">
-            <div className="w-12 h-12 bg-white/20 rounded-2xl flex items-center justify-center mx-auto mb-3">
-              <Trophy className="w-6 h-6" />
+            <h3 className="font-semibold mb-2">Host a Game</h3>
+          </button>
+
+          <button
+            className="group text-center text-white transition hover:scale-105 hover:bg-white/30 bg-transparent w-fit mx-auto p-6 rounded-3xl hover:shadow-lg select-none cursor-pointer"
+            onClick={onCreateQuiz}
+          >
+            <div className="w-12 h-12 bg-white/20 rounded-2xl flex items-center justify-center mx-auto mb-3 transition group-hover:bg-transparent">
+              <HelpCircle className="w-6 h-6" />
             </div>
-            <h3 className="font-semibold mb-2">Live Leaderboard</h3>
-            <p className="text-white/80 text-sm">Compete with others and climb the rankings</p>
-          </div>
-          <div className="text-center text-white">
-            <div className="w-12 h-12 bg-white/20 rounded-2xl flex items-center justify-center mx-auto mb-3">
-              <Users className="w-6 h-6" />
-            </div>
-            <h3 className="font-semibold mb-2">Multiplayer Fun</h3>
-            <p className="text-white/80 text-sm">Play with friends, family, or colleagues</p>
-          </div>
+            <h3 className="font-semibold mb-2">Create a Quiz</h3>
+          </button>
         </div>
       </div>
     </div>
   );
-};
+}
