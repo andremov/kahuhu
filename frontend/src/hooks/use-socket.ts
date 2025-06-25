@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { io, Socket } from 'socket.io-client';
-import { GameState, QuestionResult, FinalResults } from '../types';
+import { getConfigValue } from '../utils/config';
+// import { GameState, QuestionResult, FinalResults } from '../utils/types';
 
 interface UseSocketReturn {
   socket: Socket | null;
@@ -18,8 +19,8 @@ export const useSocket = (): UseSocketReturn => {
 
   useEffect(() => {
     // Initialize socket connection
-    socketRef.current = io('http://localhost:3001', {
-      transports: ['websocket']
+    socketRef.current = io(getConfigValue('apiAddress'), {
+      transports: ['websocket'],
     });
 
     const socket = socketRef.current;
@@ -80,6 +81,6 @@ export const useSocket = (): UseSocketReturn => {
     joinGame,
     startGame,
     submitAnswer,
-    nextQuestion
+    nextQuestion,
   };
 };

@@ -1,8 +1,18 @@
 import { useState, useEffect } from 'react';
 import { useSocket } from './use-socket';
-import { GameState, QuestionResult, FinalResults } from '../types';
+import { GameState, QuestionResult, FinalResults } from '../utils/types';
+
+type AppStateOptions =
+  | 'home'
+  | 'create-quiz'
+  | 'lobby'
+  | 'question'
+  | 'results'
+  | 'final'
+  | 'connecting';
 
 interface UseGameStateReturn {
+  appState: AppStateOptions;
   gameState: GameState | null;
   playerId: string | null;
   isHost: boolean;
@@ -10,6 +20,8 @@ interface UseGameStateReturn {
   finalResults: FinalResults | null;
   error: string | null;
   isConnected: boolean;
+
+  setAppState: (state: AppStateOptions) => void;
   createGame: (quiz: any) => void;
   joinGame: (gameCode: string, playerName: string) => void;
   startGame: () => void;
@@ -19,8 +31,10 @@ interface UseGameStateReturn {
 }
 
 export const useGameState = (): UseGameStateReturn => {
-  const { socket, isConnected, createGame, joinGame, startGame, submitAnswer, nextQuestion } = useSocket();
+  const { socket, isConnected, createGame, joinGame, startGame, submitAnswer, nextQuestion } =
+    useSocket();
   const [gameState, setGameState] = useState<GameState | null>(null);
+  const [appState, setAppState] = useState<AppStateOptions>('home');
   const [playerId, setPlayerId] = useState<string | null>(null);
   const [isHost, setIsHost] = useState(false);
   const [questionResult, setQuestionResult] = useState<QuestionResult | null>(null);
@@ -68,7 +82,7 @@ export const useGameState = (): UseGameStateReturn => {
     });
 
     socket.on('time-update', ({ timeRemaining }) => {
-      setGameState(prev => prev ? { ...prev, timeRemaining } : null);
+      setGameState((prev) => (prev ? { ...prev, timeRemaining } : null));
     });
 
     socket.on('answer-submitted', ({ answerIndex, isCorrect, score, totalScore }) => {
@@ -77,7 +91,7 @@ export const useGameState = (): UseGameStateReturn => {
 
     socket.on('question-ended', (result: QuestionResult) => {
       setQuestionResult(result);
-      setGameState(prev => prev ? { ...prev, gameState: 'results' } : null);
+      setGameState((prev) => (prev ? { ...prev, gameState: 'results' } : null));
     });
 
     socket.on('next-question', (newGameState) => {
@@ -87,7 +101,7 @@ export const useGameState = (): UseGameStateReturn => {
 
     socket.on('game-ended', (results: FinalResults) => {
       setFinalResults(results);
-      setGameState(prev => prev ? { ...prev, gameState: 'final' } : null);
+      setGameState((prev) => (prev ? { ...prev, gameState: 'final' } : null));
     });
 
     socket.on('host-disconnected', () => {
@@ -126,6 +140,7 @@ export const useGameState = (): UseGameStateReturn => {
   };
 
   return {
+    appState,
     gameState,
     playerId,
     isHost,
@@ -133,11 +148,13 @@ export const useGameState = (): UseGameStateReturn => {
     finalResults,
     error,
     isConnected,
+
+    setAppState,
     createGame,
     joinGame,
     startGame,
     submitAnswer,
     nextQuestion,
-    resetGame
+    resetGame,
   };
 };
