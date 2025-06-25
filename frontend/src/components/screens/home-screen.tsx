@@ -1,60 +1,41 @@
-import { Plus, Trophy, HelpCircle } from 'lucide-react';
+import { Plus, Trophy, HelpCircle, ListOrdered } from 'lucide-react';
 import { Quiz } from '../../utils/types';
-import { useEffect, useState } from 'react';
-import { fetchQuizzes } from '../../utils/api';
 import { JoinForm } from '../forms/join-form';
 
 interface HomeScreenProps {
   onCreateGame: (quiz: Quiz) => void;
   onCreateQuiz: () => void;
+  onListQuizzes: () => void;
   onJoinGame: (gameCode: string, playerName: string) => void;
   error?: string | null;
 }
 
-export function HomeScreen({ onCreateGame, onJoinGame, error, onCreateQuiz }: HomeScreenProps) {
-  const [selectedQuiz, setSelectedQuiz] = useState<Quiz | null>(null);
-  const [loadedQuizzes, setLoadedQuizzes] = useState<Quiz[]>([]);
-
-  useEffect(() => {
-    const callFetchQuizzes = async () => {
-      try {
-        const response = await fetchQuizzes();
-        setLoadedQuizzes(response);
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      } catch (error) {
-        // console.error('Error fetching quizzes:', error);
-      }
-    };
-
-    callFetchQuizzes();
-  }, []);
-
-  const handleCreateGame = () => {
-    if (selectedQuiz) {
-      onCreateGame(selectedQuiz);
-    }
-  };
-
+export function HomeScreen({
+  onCreateGame,
+  onJoinGame,
+  onListQuizzes,
+  error,
+  onCreateQuiz,
+}: HomeScreenProps) {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-600 via-pink-500 to-orange-400">
-      <div className="container mx-auto px-4 py-8">
-        {/* Header */}
-        <div className="text-center mb-12">
-          <div className="inline-flex items-center space-x-3 mb-4">
-            <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center shadow-lg">
-              <Trophy className="w-7 h-7 text-purple-600" />
-            </div>
-            <h1 className="text-4xl md:text-6xl font-bold text-white">Kahuhu</h1>
+    <div className="container mx-auto px-4 py-8">
+      {/* Header */}
+      <div className="text-center mb-12 h-20">
+        <div className="inline-flex items-center space-x-3 mb-4">
+          <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center shadow-lg">
+            <Trophy className="w-7 h-7 text-purple-600" />
           </div>
+          <h1 className="text-4xl md:text-6xl font-bold text-white">Kahuhu</h1>
         </div>
+      </div>
 
-        {/* Main Actions */}
-        <div className="grid md:grid-rows-1 gap-8 max-w-4xl mx-auto mb-12">
-          {/* Join Game */}
-          <JoinForm onJoinGame={onJoinGame} error={error} />
+      {/* Main Actions */}
+      <div className="grid md:grid-rows-1 gap-8 max-w-4xl mx-auto mb-12">
+        {/* Join Game */}
+        <JoinForm onJoinGame={onJoinGame} error={error} />
 
-          {/* Host Game */}
-          {/* <div className="bg-white/95 backdrop-blur-sm rounded-3xl p-8 shadow-2xl">
+        {/* Host Game */}
+        {/* <div className="bg-white/95 backdrop-blur-sm rounded-3xl p-8 shadow-2xl">
             <div className="text-center mb-6">
               <div className="w-16 h-16 bg-gradient-to-r from-purple-500 to-purple-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
                 <Plus className="w-8 h-8 text-white" />
@@ -96,29 +77,38 @@ export function HomeScreen({ onCreateGame, onJoinGame, error, onCreateQuiz }: Ho
               Create Game
             </Button>
           </div> */}
-        </div>
+      </div>
 
-        <div className="grid md:grid-cols-2 gap-4 max-w-lg mx-auto">
-          <button
-            className="group text-center text-white transition hover:scale-105 hover:bg-white/30 bg-transparent w-fit mx-auto p-6 rounded-3xl hover:shadow-lg select-none cursor-pointer"
-            onClick={onCreateGame}
-          >
-            <div className="w-12 h-12 bg-white/20 rounded-2xl flex items-center justify-center mx-auto mb-3 transition group-hover:bg-transparent">
-              <Plus className="w-6 h-6" />
-            </div>
-            <h3 className="font-semibold mb-2">Host a Game</h3>
-          </button>
+      <div className="grid md:grid-cols-3 gap-4 max-w-lg mx-auto">
+        <button
+          className="group text-center text-white transition hover:scale-105 hover:bg-white/30 bg-transparent w-fit mx-auto p-6 rounded-3xl hover:shadow-lg select-none cursor-pointer"
+          onClick={onCreateGame}
+        >
+          <div className="w-12 h-12 bg-white/20 rounded-2xl flex items-center justify-center mx-auto mb-3 transition group-hover:bg-transparent">
+            <Plus className="w-6 h-6" />
+          </div>
+          <h3 className="font-semibold mb-2">Host a Game</h3>
+        </button>
 
-          <button
-            className="group text-center text-white transition hover:scale-105 hover:bg-white/30 bg-transparent w-fit mx-auto p-6 rounded-3xl hover:shadow-lg select-none cursor-pointer"
-            onClick={onCreateQuiz}
-          >
-            <div className="w-12 h-12 bg-white/20 rounded-2xl flex items-center justify-center mx-auto mb-3 transition group-hover:bg-transparent">
-              <HelpCircle className="w-6 h-6" />
-            </div>
-            <h3 className="font-semibold mb-2">Create a Quiz</h3>
-          </button>
-        </div>
+        <button
+          className="group text-center text-white transition hover:scale-105 hover:bg-white/30 bg-transparent w-fit mx-auto p-6 rounded-3xl hover:shadow-lg select-none cursor-pointer"
+          onClick={onCreateQuiz}
+        >
+          <div className="w-12 h-12 bg-white/20 rounded-2xl flex items-center justify-center mx-auto mb-3 transition group-hover:bg-transparent">
+            <HelpCircle className="w-6 h-6" />
+          </div>
+          <h3 className="font-semibold mb-2">Create a Quiz</h3>
+        </button>
+
+        <button
+          className="group text-center text-white transition hover:scale-105 hover:bg-white/30 bg-transparent w-fit mx-auto p-6 rounded-3xl hover:shadow-lg select-none cursor-pointer"
+          onClick={onListQuizzes}
+        >
+          <div className="w-12 h-12 bg-white/20 rounded-2xl flex items-center justify-center mx-auto mb-3 transition group-hover:bg-transparent">
+            <ListOrdered className="w-6 h-6" />
+          </div>
+          <h3 className="font-semibold mb-2">List Quizzes</h3>
+        </button>
       </div>
     </div>
   );

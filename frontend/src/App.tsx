@@ -8,6 +8,7 @@ import { CreateQuizScreen } from './components/screens/create-quiz-screen';
 // import { LoadingSpinner } from './components/ui/loading-spinner';
 import { useGameState } from './hooks/use-game-state';
 import { Quiz } from './utils/types';
+import { QuizListScreen } from './components/screens/quiz-list-screen';
 
 export default function App() {
   const [hasAnswered, setHasAnswered] = useState(false);
@@ -39,34 +40,30 @@ export default function App() {
   }, [isConnected, appState]);
 
   // Handle game state changes
-  useEffect(() => {
-    if (!gameState) {
-      if (appState !== 'home' && appState !== 'create-quiz' && appState !== 'connecting') {
-        setAppState('home');
-      }
-      return;
-    }
+  // useEffect(() => {
+  //   if (!gameState) {
+  //     if (appState !== 'home' && appState !== 'create-quiz' && appState !== 'connecting') {
+  //       setAppState('home');
+  //     }
+  //     return;
+  //   }
 
-    switch (gameState.gameState) {
-      case 'lobby':
-        setAppState('lobby');
-        break;
-      case 'question':
-        setAppState('question');
-        setHasAnswered(false);
-        break;
-      case 'results':
-        setAppState('results');
-        break;
-      case 'final':
-        setAppState('final');
-        break;
-    }
-  }, [gameState?.gameState, appState]);
-
-  const handleCreateGame = (quiz: Quiz) => {
-    createGame(quiz);
-  };
+  //   switch (gameState.gameState) {
+  //     case 'lobby':
+  //       setAppState('lobby');
+  //       break;
+  //     case 'question':
+  //       setAppState('question');
+  //       setHasAnswered(false);
+  //       break;
+  //     case 'results':
+  //       setAppState('results');
+  //       break;
+  //     case 'final':
+  //       setAppState('final');
+  //       break;
+  //   }
+  // }, [gameState?.gameState, appState]);
 
   const handleJoinGameSubmit = (gameCode: string, playerName: string) => {
     joinGame(gameCode, playerName);
@@ -85,14 +82,6 @@ export default function App() {
     nextQuestion();
   };
 
-  const handlePlayAgain = () => {
-    if (gameState) {
-      const quiz = gameState.quiz;
-      resetGame();
-      setTimeout(() => handleCreateGame(quiz), 100);
-    }
-  };
-
   const handleGoHome = () => {
     resetGame();
     setAppState('home');
@@ -103,68 +92,88 @@ export default function App() {
     setAppState('home');
   };
 
-  function handleCreateQuiz() {
-    setAppState('create-quiz');
-  }
-
-  // Render appropriate screen based on app state
-
-  switch (appState) {
-    case 'home':
-      return (
+  return (
+    <div className="min-h-screen bg-gradient-[40deg,purple_10%,pink_50%,orange_90%]">
+      {appState === 'home' && (
         <HomeScreen
-          onCreateGame={handleCreateGame}
-          onCreateQuiz={handleCreateQuiz}
+          onCreateGame={() => setAppState('create-game')}
+          onCreateQuiz={() => setAppState('create-quiz')}
+          onListQuizzes={() => setAppState('list-quizzes')}
           onJoinGame={handleJoinGameSubmit}
           error={error}
         />
-      );
+      )}
 
-    case 'create-quiz':
-      return <CreateQuizScreen />;
-
-    case 'lobby':
-      return gameState ? (
-        <GameLobbyScreen
-          gameState={gameState}
-          isHost={isHost}
-          onStartGame={handleStartGame}
-          onLeaveGame={handleLeaveGame}
+      {appState === 'create-quiz' && (
+        <CreateQuizScreen
+          onBack={() => setAppState('list-quizzes')}
+          // quizId={selectedQuizId} // Pass the selected quiz ID if editing
         />
-      ) : null;
+      )}
 
-    case 'question':
-      return gameState ? (
-        <QuestionScreen
-          gameState={gameState}
-          playerId={playerId}
-          onSubmitAnswer={handleSubmitAnswer}
-          isHost={isHost}
-          hasAnswered={hasAnswered}
+      {appState === 'list-quizzes' && (
+        <QuizListScreen
+          onBack={() => setAppState('home')}
+          onCreateQuiz={() => setAppState('create-quiz')}
+          onHostQuiz={(quizId: string) => {
+            // createGame(quizId);
+            // setAppState('lobby');
+          }}
+          onEditQuiz={(quizId: string) => {
+            setAppState('create-quiz');
+            // Navigate to edit quiz screen (not implemented in this example)
+          }}
+          onDeleteQuiz={(quizId: string) => {
+            // Handle quiz deletion (not implemented in this example)
+          }}
         />
-      ) : null;
+      )}
+    </div>
+  );
 
-    case 'results':
-      return gameState && questionResult ? (
-        <ResultsScreen
-          gameState={gameState}
-          questionResult={questionResult}
-          onContinue={handleNextQuestion}
-          isHost={isHost}
-        />
-      ) : null;
+  // switch (appState) {
+  //   case 'lobby':
+  //     return gameState ? (
+  //       <GameLobbyScreen
+  //         gameState={gameState}
+  //         isHost={isHost}
+  //         onStartGame={handleStartGame}
+  //         onLeaveGame={handleLeaveGame}
+  //       />
+  //     ) : null;
 
-    case 'final':
-      return finalResults ? (
-        <FinalResultsScreen
-          finalResults={finalResults}
-          onPlayAgain={handlePlayAgain}
-          onGoHome={handleGoHome}
-          isHost={isHost}
-        />
-      ) : null;
+  //   case 'question':
+  //     return gameState ? (
+  //       <QuestionScreen
+  //         gameState={gameState}
+  //         playerId={playerId}
+  //         onSubmitAnswer={handleSubmitAnswer}
+  //         isHost={isHost}
+  //         hasAnswered={hasAnswered}
+  //       />
+  //     ) : null;
 
-    default:
-      return null;
-  }
+  //   case 'results':
+  //     return gameState && questionResult ? (
+  //       <ResultsScreen
+  //         gameState={gameState}
+  //         questionResult={questionResult}
+  //         onContinue={handleNextQuestion}
+  //         isHost={isHost}
+  //       />
+  //     ) : null;
+
+  //   case 'final':
+  //     return finalResults ? (
+  //       <FinalResultsScreen
+  //         finalResults={finalResults}
+  //         onPlayAgain={() => {}}
+  //         onGoHome={handleGoHome}
+  //         isHost={isHost}
+  //       />
+  //     ) : null;
+
+  //   default:
+  //     return null;
+  // }
 }
