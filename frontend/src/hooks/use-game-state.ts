@@ -5,10 +5,12 @@ import { GameState, QuestionResult, FinalResults } from '../utils/types';
 type AppStateOptions =
   | 'home'
   | 'create-quiz'
+  | 'create-game'
   | 'lobby'
   | 'question'
   | 'results'
   | 'final'
+  | 'list-quizzes'
   | 'connecting';
 
 interface UseGameStateReturn {
@@ -20,7 +22,9 @@ interface UseGameStateReturn {
   finalResults: FinalResults | null;
   error: string | null;
   isConnected: boolean;
+  selectedQuizId: string | null;
 
+  setSelectedQuizId: (newId: string | null) => void;
   setAppState: (state: AppStateOptions) => void;
   createGame: (quiz: any) => void;
   joinGame: (gameCode: string, playerName: string) => void;
@@ -40,6 +44,7 @@ export const useGameState = (): UseGameStateReturn => {
   const [questionResult, setQuestionResult] = useState<QuestionResult | null>(null);
   const [finalResults, setFinalResults] = useState<FinalResults | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [selectedQuizId, setSelectedQuizId] = useState<string | null>(null);
 
   useEffect(() => {
     if (!socket) return;
@@ -148,7 +153,9 @@ export const useGameState = (): UseGameStateReturn => {
     finalResults,
     error,
     isConnected,
+    selectedQuizId,
 
+    setSelectedQuizId,
     setAppState,
     createGame,
     joinGame,
