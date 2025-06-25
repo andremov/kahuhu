@@ -1,7 +1,7 @@
 import React from 'react';
 import { Timer } from '../ui/timer';
 import { ProgressBar } from '../ui/progress-bar';
-import { GameState } from '../../types';
+import { GameState } from '../../utils/types';
 
 interface QuestionScreenProps {
   gameState: GameState;
@@ -19,7 +19,7 @@ export const QuestionScreen: React.FC<QuestionScreenProps> = ({
   hasAnswered = false,
 }) => {
   const currentQuestion = gameState.quiz.questions[gameState.currentQuestionIndex];
-  
+
   const answeredCount = gameState.players.length; // This would need to be tracked properly in real implementation
 
   const getAnswerColors = (index: number) => {
@@ -87,9 +87,10 @@ export const QuestionScreen: React.FC<QuestionScreenProps> = ({
                   disabled={hasAnswered || gameState.timeRemaining <= 0}
                   className={`
                     p-6 rounded-2xl text-white font-bold text-lg transition-all duration-200 transform
-                    ${hasAnswered || gameState.timeRemaining <= 0 
-                      ? 'opacity-50 cursor-not-allowed' 
-                      : 'hover:scale-105 active:scale-95 shadow-lg hover:shadow-xl'
+                    ${
+                      hasAnswered || gameState.timeRemaining <= 0
+                        ? 'opacity-50 cursor-not-allowed'
+                        : 'hover:scale-105 active:scale-95 shadow-lg hover:shadow-xl'
                     }
                     bg-gradient-to-r ${getAnswerColors(index)}
                   `}
@@ -119,16 +120,14 @@ export const QuestionScreen: React.FC<QuestionScreenProps> = ({
         {isHost && (
           <div className="max-w-2xl mx-auto">
             <div className="bg-white/95 backdrop-blur-sm rounded-3xl p-6 shadow-2xl">
-              <h3 className="text-xl font-bold text-gray-800 mb-4 text-center">
-                Players Progress
-              </h3>
+              <h3 className="text-xl font-bold text-gray-800 mb-4 text-center">Players Progress</h3>
               <div className="text-center mb-6">
                 <div className="text-3xl font-bold text-purple-600">
                   {answeredCount} / {gameState.players.length}
                 </div>
                 <div className="text-gray-600">players answered</div>
               </div>
-              
+
               <div className="space-y-3">
                 {gameState.players.map((player) => (
                   <div
@@ -136,12 +135,8 @@ export const QuestionScreen: React.FC<QuestionScreenProps> = ({
                     className="flex items-center space-x-3 p-3 rounded-xl bg-gray-50"
                   >
                     <div className="w-3 h-3 rounded-full bg-green-500" />
-                    <span className="flex-1 font-medium text-gray-800">
-                      {player.name}
-                    </span>
-                    <span className="text-green-600 text-sm font-semibold">
-                      ✓ Ready
-                    </span>
+                    <span className="flex-1 font-medium text-gray-800">{player.name}</span>
+                    <span className="text-green-600 text-sm font-semibold">✓ Ready</span>
                   </div>
                 ))}
               </div>

@@ -1,6 +1,6 @@
 import React from 'react';
 import { Trophy, Medal, Award, RotateCcw, Home } from 'lucide-react';
-import { FinalResults } from '../../types';
+import { FinalResults } from '../../utils/types';
 import { Button } from '../ui/button';
 
 interface FinalResultsScreenProps {
@@ -26,9 +26,11 @@ export const FinalResultsScreen: React.FC<FinalResultsScreenProps> = ({
   };
 
   const getPositionClass = (index: number) => {
-    if (index === 0) return 'bg-gradient-to-r from-yellow-50 to-yellow-100 border-yellow-300 border-2';
+    if (index === 0)
+      return 'bg-gradient-to-r from-yellow-50 to-yellow-100 border-yellow-300 border-2';
     if (index === 1) return 'bg-gradient-to-r from-gray-50 to-gray-100 border-gray-300 border-2';
-    if (index === 2) return 'bg-gradient-to-r from-orange-50 to-orange-100 border-orange-300 border-2';
+    if (index === 2)
+      return 'bg-gradient-to-r from-orange-50 to-orange-100 border-orange-300 border-2';
     return 'bg-white border-gray-200 border';
   };
 
@@ -39,9 +41,7 @@ export const FinalResultsScreen: React.FC<FinalResultsScreenProps> = ({
         <div className="text-center mb-8">
           <div className="mb-6">
             <div className="text-8xl mb-4">🎉</div>
-            <h1 className="text-4xl md:text-6xl font-bold text-white mb-2">
-              Game Complete!
-            </h1>
+            <h1 className="text-4xl md:text-6xl font-bold text-white mb-2">Game Complete!</h1>
             <p className="text-xl text-white/90">
               {finalResults.quiz.title} • {finalResults.quiz.totalQuestions} questions
             </p>
@@ -57,7 +57,8 @@ export const FinalResultsScreen: React.FC<FinalResultsScreenProps> = ({
                 <h2 className="text-2xl font-bold text-gray-800 mb-2">🏆 Winner!</h2>
                 <h3 className="text-3xl font-bold text-yellow-600 mb-2">{winner.name}</h3>
                 <p className="text-gray-600">
-                  {winner.score} points • {winner.correctAnswers}/{finalResults.quiz.totalQuestions} correct
+                  {winner.score} points • {winner.correctAnswers}/{finalResults.quiz.totalQuestions}{' '}
+                  correct
                 </p>
               </div>
             </div>
@@ -67,10 +68,8 @@ export const FinalResultsScreen: React.FC<FinalResultsScreenProps> = ({
         {/* Final Leaderboard */}
         <div className="max-w-2xl mx-auto mb-8">
           <div className="bg-white/95 backdrop-blur-sm rounded-3xl p-6 shadow-2xl">
-            <h2 className="text-2xl font-bold text-gray-800 mb-6 text-center">
-              Final Leaderboard
-            </h2>
-            
+            <h2 className="text-2xl font-bold text-gray-800 mb-6 text-center">Final Leaderboard</h2>
+
             <div className="space-y-4">
               {finalResults.players.map((player, index) => (
                 <div
@@ -84,7 +83,7 @@ export const FinalResultsScreen: React.FC<FinalResultsScreenProps> = ({
                       </div>
                     )}
                   </div>
-                  
+
                   <div className="flex-1">
                     <div className="font-bold text-gray-800 text-lg">{player.name}</div>
                     <div className="text-sm text-gray-600">
@@ -93,9 +92,7 @@ export const FinalResultsScreen: React.FC<FinalResultsScreenProps> = ({
                   </div>
 
                   <div className="text-right">
-                    <div className="text-2xl font-bold text-purple-600">
-                      {player.score}
-                    </div>
+                    <div className="text-2xl font-bold text-purple-600">{player.score}</div>
                     <div className="text-sm text-gray-600">points</div>
                   </div>
                 </div>
@@ -130,31 +127,18 @@ export const FinalResultsScreen: React.FC<FinalResultsScreenProps> = ({
         {/* Action Buttons */}
         <div className="max-w-md mx-auto space-y-4">
           {isHost && (
-            <Button
-              onClick={onPlayAgain}
-              icon={RotateCcw}
-              size="lg"
-              className="w-full"
-            >
+            <Button onClick={onPlayAgain} icon={RotateCcw} size="lg" className="w-full">
               Play Again
             </Button>
           )}
-          <Button
-            onClick={onGoHome}
-            variant="secondary"
-            icon={Home}
-            size="lg"
-            className="w-full"
-          >
+          <Button onClick={onGoHome} variant="secondary" icon={Home} size="lg" className="w-full">
             Back to Home
           </Button>
         </div>
 
         {/* Thank You Message */}
         <div className="text-center mt-12">
-          <p className="text-white/80 text-lg">
-            Thanks for playing! 🎮
-          </p>
+          <p className="text-white/80 text-lg">Thanks for playing! 🎮</p>
         </div>
       </div>
     </div>
