@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { GameSession, Player, Quiz, QuestionResult } from '../types';
+import { GameSession, Player, Quiz, QuestionResult } from '../utils/types';
 
 export const useGameSession = () => {
   const [gameSession, setGameSession] = useState<GameSession | null>(null);
@@ -20,57 +20,71 @@ export const useGameSession = () => {
     return gameCode;
   }, []);
 
-  const joinGame = useCallback((gameCode: string, playerName: string) => {
-    if (!gameSession || gameSession.gameCode !== gameCode) {
-      return null;
-    }
+  const joinGame = useCallback(
+    (gameCode: string, playerName: string) => {
+      if (!gameSession || gameSession.gameCode !== gameCode) {
+        return null;
+      }
 
-    const newPlayer: Player = {
-      id: `player-${Date.now()}`,
-      name: playerName,
-      score: 0,
-      answers: new Array(gameSession.quiz.questions.length).fill(null),
-      joinedAt: new Date(),
-    };
+      const newPlayer: Player = {
+        id: `player-${Date.now()}`,
+        name: playerName,
+        score: 0,
+        answers: new Array(gameSession.quiz.questions.length).fill(null),
+        joinedAt: new Date(),
+      };
 
-    setGameSession(prev => prev ? {
-      ...prev,
-      players: [...prev.players, newPlayer]
-    } : null);
+      setGameSession((prev) =>
+        prev
+          ? {
+              ...prev,
+              players: [...prev.players, newPlayer],
+            }
+          : null
+      );
 
-    return newPlayer.id;
-  }, [gameSession]);
+      return newPlayer.id;
+    },
+    [gameSession]
+  );
 
   const startGame = useCallback(() => {
     if (!gameSession || gameSession.players.length === 0) return;
 
-    setGameSession(prev => prev ? {
-      ...prev,
-      gameState: 'question',
-      currentQuestionIndex: 0,
-      timeRemaining: prev.quiz.questions[0]?.timeLimit || 30,
-      startedAt: new Date(),
-    } : null);
+    setGameSession((prev) =>
+      prev
+        ? {
+            ...prev,
+            gameState: 'question',
+            currentQuestionIndex: 0,
+            timeRemaining: prev.quiz.questions[0]?.timeLimit || 30,
+            startedAt: new Date(),
+          }
+        : null
+    );
   }, [gameSession]);
 
-  const submitAnswer = useCallback((playerId: string, answerIndex: number) => {
-    if (!gameSession || gameSession.gameState !== 'question') return;
+  const submitAnswer = useCallback(
+    (playerId: string, answerIndex: number) => {
+      if (!gameSession || gameSession.gameState !== 'question') return;
 
-    setGameSession(prev => {
-      if (!prev) return null;
+      setGameSession((prev) => {
+        if (!prev) return null;
 
-      const updatedPlayers = prev.players.map(player => {
-        if (player.id === playerId) {
-          const newAnswers = [...player.answers];
-          newAnswers[prev.currentQuestionIndex] = answerIndex;
-          return { ...player, answers: newAnswers };
-        }
-        return player;
+        const updatedPlayers = prev.players.map((player) => {
+          if (player.id === playerId) {
+            const newAnswers = [...player.answers];
+            newAnswers[prev.currentQuestionIndex] = answerIndex;
+            return { ...player, answers: newAnswers };
+          }
+          return player;
+        });
+
+        return { ...prev, players: updatedPlayers };
       });
-
-      return { ...prev, players: updatedPlayers };
-    });
-  }, [gameSession]);
+    },
+    [gameSession]
+  );
 
   const nextQuestion = useCallback(() => {
     if (!gameSession) return;
@@ -86,7 +100,7 @@ export const useGameSession = () => {
       scores: {},
     };
 
-    const updatedPlayers = gameSession.players.map(player => {
+    const updatedPlayers = gameSession.players.map((player) => {
       const playerAnswer = player.answers[gameSession.currentQuestionIndex];
       questionResult.playerAnswers[player.id] = playerAnswer;
 
@@ -101,24 +115,32 @@ export const useGameSession = () => {
       return { ...player, score: player.score + questionScore };
     });
 
-    setQuestionResults(prev => [...prev, questionResult]);
+    setQuestionResults((prev) => [...prev, questionResult]);
 
     if (gameSession.currentQuestionIndex + 1 >= gameSession.quiz.questions.length) {
       // Game is over
-      setGameSession(prev => prev ? {
-        ...prev,
-        players: updatedPlayers,
-        gameState: 'final',
-        timeRemaining: 0,
-      } : null);
+      setGameSession((prev) =>
+        prev
+          ? {
+              ...prev,
+              players: updatedPlayers,
+              gameState: 'final',
+              timeRemaining: 0,
+            }
+          : null
+      );
     } else {
       // Move to results state, then next question
-      setGameSession(prev => prev ? {
-        ...prev,
-        players: updatedPlayers,
-        gameState: 'results',
-        timeRemaining: 5, // Show results for 5 seconds
-      } : null);
+      setGameSession((prev) =>
+        prev
+          ? {
+              ...prev,
+              players: updatedPlayers,
+              gameState: 'results',
+              timeRemaining: 5, // Show results for 5 seconds
+            }
+          : null
+      );
     }
   }, [gameSession]);
 
@@ -128,12 +150,16 @@ export const useGameSession = () => {
     const nextIndex = gameSession.currentQuestionIndex + 1;
     const nextQuestion = gameSession.quiz.questions[nextIndex];
 
-    setGameSession(prev => prev ? {
-      ...prev,
-      currentQuestionIndex: nextIndex,
-      gameState: 'question',
-      timeRemaining: nextQuestion.timeLimit,
-    } : null);
+    setGameSession((prev) =>
+      prev
+        ? {
+            ...prev,
+            currentQuestionIndex: nextIndex,
+            gameState: 'question',
+            timeRemaining: nextQuestion.timeLimit,
+          }
+        : null
+    );
   }, [gameSession]);
 
   const resetGame = useCallback(() => {
