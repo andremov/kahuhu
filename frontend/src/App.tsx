@@ -1,21 +1,19 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { HomeScreen } from './components/screens/home-screen';
-import { JoinGameScreen } from './components/screens/join-game-screen';
 import { GameLobbyScreen } from './components/screens/game-lobby-screen';
 import { QuestionScreen } from './components/screens/question-screen';
 import { ResultsScreen } from './components/screens/results-screen';
 import { FinalResultsScreen } from './components/screens/final-results-screen';
-import { LoadingSpinner } from './components/ui/loading-spinner';
+import { CreateQuizScreen } from './components/screens/create-quiz-screen';
+// import { LoadingSpinner } from './components/ui/loading-spinner';
 import { useGameState } from './hooks/use-game-state';
-import { Quiz } from './types';
+import { Quiz } from './utils/types';
 
-type AppState = 'home' | 'join' | 'lobby' | 'question' | 'results' | 'final' | 'connecting';
-
-function App() {
-  const [appState, setAppState] = useState<AppState>('connecting');
+export default function App() {
   const [hasAnswered, setHasAnswered] = useState(false);
 
   const {
+    appState,
     gameState,
     playerId,
     isHost,
@@ -23,6 +21,8 @@ function App() {
     finalResults,
     error,
     isConnected,
+
+    setAppState,
     createGame,
     joinGame,
     startGame,
@@ -41,7 +41,7 @@ function App() {
   // Handle game state changes
   useEffect(() => {
     if (!gameState) {
-      if (appState !== 'home' && appState !== 'join' && appState !== 'connecting') {
+      if (appState !== 'home' && appState !== 'create-quiz' && appState !== 'connecting') {
         setAppState('home');
       }
       return;
@@ -103,37 +103,25 @@ function App() {
     setAppState('home');
   };
 
-  // Show connection screen
-  if (appState === 'connecting') {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-purple-600 via-pink-500 to-orange-400 flex items-center justify-center">
-        <div className="text-center">
-          <LoadingSpinner size="lg" className="mx-auto mb-4" />
-          <h2 className="text-2xl font-bold text-white mb-2">Connecting to Server</h2>
-          <p className="text-white/80">Please wait while we establish connection...</p>
-        </div>
-      </div>
-    );
+  function handleCreateQuiz() {
+    setAppState('create-quiz');
   }
 
   // Render appropriate screen based on app state
+
   switch (appState) {
     case 'home':
       return (
         <HomeScreen
           onCreateGame={handleCreateGame}
-          onJoinGame={() => setAppState('join')}
-        />
-      );
-
-    case 'join':
-      return (
-        <JoinGameScreen
-          onBack={() => setAppState('home')}
+          onCreateQuiz={handleCreateQuiz}
           onJoinGame={handleJoinGameSubmit}
           error={error}
         />
       );
+
+    case 'create-quiz':
+      return <CreateQuizScreen />;
 
     case 'lobby':
       return gameState ? (
@@ -180,5 +168,3 @@ function App() {
       return null;
   }
 }
-
-export default App;
