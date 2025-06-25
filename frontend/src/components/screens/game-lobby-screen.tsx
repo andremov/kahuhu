@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Play, Users, Copy, Check, Crown } from 'lucide-react';
 import { Button } from '../ui/button';
-import { GameState } from '../../types';
+import { GameState } from '../../utils/types';
 
 interface GameLobbyScreenProps {
   gameState: GameState;
@@ -28,8 +28,8 @@ export const GameLobbyScreen: React.FC<GameLobbyScreenProps> = ({
     }
   };
 
-  const sortedPlayers = [...gameState.players].sort((a, b) => 
-    a.joinedAt.getTime() - b.joinedAt.getTime()
+  const sortedPlayers = [...gameState.players].sort(
+    (a, b) => a.joinedAt.getTime() - b.joinedAt.getTime()
   );
 
   return (
@@ -43,9 +43,7 @@ export const GameLobbyScreen: React.FC<GameLobbyScreenProps> = ({
             </div>
             <h1 className="text-4xl font-bold text-white">Game Lobby</h1>
           </div>
-          <h2 className="text-2xl text-white/90 font-semibold mb-2">
-            {gameState.quiz.title}
-          </h2>
+          <h2 className="text-2xl text-white/90 font-semibold mb-2">{gameState.quiz.title}</h2>
           <p className="text-white/80">{gameState.quiz.description}</p>
         </div>
 
@@ -67,9 +65,7 @@ export const GameLobbyScreen: React.FC<GameLobbyScreenProps> = ({
                 {copied ? 'Copied!' : 'Copy'}
               </Button>
             </div>
-            <p className="text-gray-600 text-sm">
-              Share this code with players to join the game
-            </p>
+            <p className="text-gray-600 text-sm">Share this code with players to join the game</p>
           </div>
         </div>
 
@@ -80,9 +76,7 @@ export const GameLobbyScreen: React.FC<GameLobbyScreenProps> = ({
               <h3 className="text-xl font-bold text-gray-800">
                 Players ({gameState.players.length})
               </h3>
-              <div className="text-sm text-gray-600">
-                Waiting for more players...
-              </div>
+              <div className="text-sm text-gray-600">Waiting for more players...</div>
             </div>
 
             {gameState.players.length === 0 ? (
@@ -141,7 +135,10 @@ export const GameLobbyScreen: React.FC<GameLobbyScreenProps> = ({
               </div>
               <div className="bg-pink-50 p-3 rounded-xl">
                 <div className="text-2xl font-bold text-pink-600">
-                  ~{Math.ceil(gameState.quiz.questions.reduce((acc, q) => acc + q.timeLimit, 0) / 60)}
+                  ~
+                  {Math.ceil(
+                    gameState.quiz.questions.reduce((acc, q) => acc + q.timeLimit, 0) / 60
+                  )}
                 </div>
                 <div className="text-gray-600">Minutes</div>
               </div>
@@ -162,12 +159,7 @@ export const GameLobbyScreen: React.FC<GameLobbyScreenProps> = ({
               Start Game
             </Button>
           )}
-          <Button
-            onClick={onLeaveGame}
-            variant="secondary"
-            size="lg"
-            className="w-full"
-          >
+          <Button onClick={onLeaveGame} variant="secondary" size="lg" className="w-full">
             Leave Game
           </Button>
         </div>

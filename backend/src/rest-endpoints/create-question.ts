@@ -2,13 +2,13 @@ import { Request, Response } from 'express';
 import { addQuestionToQuiz } from '../services/quizzes-and-questions';
 
 export default function createQuestionEndpoint(req: Request, res: Response) {
-  const { quizId, question, answers, correctAnswer, points } = req.body;
+  const { parentQuiz, statement, options, correctAnswer, points } = req.body;
 
-  if (!quizId || !question || !answers || correctAnswer === undefined) {
+  if (!parentQuiz || !statement || !options || correctAnswer === undefined) {
     console.error('Missing required fields:', {
-      quizId,
-      question,
-      answers,
+      parentQuiz,
+      statement,
+      options,
       correctAnswer,
       points,
     });
@@ -16,7 +16,7 @@ export default function createQuestionEndpoint(req: Request, res: Response) {
     return;
   }
 
-  addQuestionToQuiz(quizId, question, answers, correctAnswer, points)
+  addQuestionToQuiz(parentQuiz, statement, options, correctAnswer, points)
     .then((newQuestion) => {
       if (newQuestion) {
         console.log('Question created successfully:', newQuestion);
