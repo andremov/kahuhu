@@ -34,11 +34,11 @@ export default function createKahuhuServer() {
     });
   });
 
-  app.use('/api', endpointRouter);
+  // app.use('/api', endpointRouter);
 
   io.on('connection', (socket) => onSocketConnection(io, socket));
 
-  connectDB();
+  // connectDB();
 
   return server;
 }

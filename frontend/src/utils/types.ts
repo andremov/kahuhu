@@ -1,9 +1,12 @@
 export interface Question {
   id: string;
-  question: string;
-  answers: string[];
-  correctAnswer: number;
+  statement: string;
+  options: QuestionOption[];
   timeLimit: number;
+}
+
+export interface QuestionOption {
+  text: string;
   points: number;
 }
 

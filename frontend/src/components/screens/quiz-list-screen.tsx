@@ -1,44 +1,20 @@
-import { useEffect, useState } from 'react';
-import { Quiz } from '../../utils/types';
-import { fetchQuizzes } from '../../utils/api';
 import { ArrowLeft, ListOrdered, Pencil, Play, PlusCircle, Trash2 } from 'lucide-react';
 import { Button } from '../ui/button';
+import { useAppStore } from '../../store/app-store';
 
-interface QuizListScreenProps {
-  onCreateQuiz: () => void;
-  onBack: () => void;
-  onHostQuiz: (quizId: string) => void;
-  onEditQuiz: (quizId: string) => void;
-  onDeleteQuiz: (quizId: string) => void;
-}
-
-export function QuizListScreen({
-  onHostQuiz,
-  onEditQuiz,
-  onDeleteQuiz,
-  onCreateQuiz,
-  onBack,
-}: QuizListScreenProps) {
-  const [loadedQuizzes, setLoadedQuizzes] = useState<Quiz[]>([]);
-
-  useEffect(() => {
-    const callFetchQuizzes = async () => {
-      try {
-        const response = await fetchQuizzes();
-        setLoadedQuizzes(response);
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      } catch (error) {
-        // console.error('Error fetching quizzes:', error);
-      }
-    };
-
-    callFetchQuizzes();
-  }, []);
+export function QuizListScreen() {
+  const { loadedQuizzes, setCurrentScreen, setEditingQuizId, setHostingQuizId, removeQuiz } =
+    useAppStore();
 
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="flex items-center mb-12 h-20">
-        <Button onClick={onBack} variant="secondary" icon={ArrowLeft} className="mr-4">
+        <Button
+          onClick={() => setCurrentScreen('home')}
+          variant="secondary"
+          icon={ArrowLeft}
+          className="mr-4"
+        >
           Back
         </Button>
         <div className="flex items-center space-x-3">
@@ -61,30 +37,25 @@ export function QuizListScreen({
             <div className="flex gap-4 mt-6 justify-end">
               <Button
                 variant="primary"
-                className="flex gap-2"
                 disabled
-                onClick={() => onHostQuiz(quiz.id)}
+                onClick={() => setHostingQuizId(quiz.id)}
+                icon={Play}
               >
-                <Play className="w-5 h-5" />
                 <p>Host</p>
               </Button>
 
               <Button
                 variant="secondary"
-                className="flex gap-2"
-                onClick={() => onEditQuiz(quiz.id)}
+                onClick={() => {
+                  setEditingQuizId(quiz.id);
+                  setCurrentScreen('create-quiz');
+                }}
+                icon={Pencil}
               >
-                <Pencil className="w-5 h-5" />
                 <p>Edit</p>
               </Button>
 
-              <Button
-                variant="danger"
-                className="flex gap-2"
-                disabled
-                onClick={() => onDeleteQuiz(quiz.id)}
-              >
-                <Trash2 className="w-5 h-5" />
+              <Button variant="danger" disabled onClick={() => removeQuiz(quiz.id)} icon={Trash2}>
                 <p>Delete</p>
               </Button>
             </div>
@@ -94,7 +65,7 @@ export function QuizListScreen({
         <Button
           className="w-full max-w-md mx-auto"
           variant="primary"
-          onClick={() => onCreateQuiz()}
+          onClick={() => setCurrentScreen('create-quiz')}
         >
           <PlusCircle className="w-5 h-5 mr-2" />
           <p className="text-lg">Create New Quiz</p>

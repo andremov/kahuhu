@@ -71,7 +71,7 @@ export const QuestionScreen: React.FC<QuestionScreenProps> = ({
               </div>
             </div>
             <h1 className="text-2xl md:text-4xl font-bold text-gray-800 leading-tight">
-              {currentQuestion.question}
+              {currentQuestion.statement}
             </h1>
           </div>
         </div>
