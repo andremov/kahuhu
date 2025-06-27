@@ -1,18 +1,19 @@
 import { FormEvent, useState } from 'react';
-import { requestCreateQuiz } from '../../utils/api';
+import { v4 } from 'uuid';
 import { Button } from '../button';
 import { BadgeHelp } from 'lucide-react';
 import { Quiz } from '../../utils/types';
+import { useAppStore } from '../../store/app-store';
 
 interface NewQuizFormProps {
-  onQuizCreated?: (quiz: Quiz) => void;
+  onSuccessCallback: (quiz: Quiz) => void;
 }
 
-export function NewQuizForm({ onQuizCreated }: NewQuizFormProps) {
+export function NewQuizForm({ onSuccessCallback }: NewQuizFormProps) {
   const [quizTitle, setQuizTitle] = useState('');
   const [quizDescription, setQuizDescription] = useState('');
   const [isCreating, setIsCreating] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const { addQuiz } = useAppStore();
 
   const handleCreateQuiz = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -22,14 +23,17 @@ export function NewQuizForm({ onQuizCreated }: NewQuizFormProps) {
 
     setIsCreating(true);
 
-    try {
-      const response = await requestCreateQuiz(quizTitle, quizDescription);
-      console.log('Quiz created successfully:', response);
-      onQuizCreated?.(response);
-    } catch (error) {
-      console.error('Error creating quiz:', error);
-      setError(error instanceof Error ? error.message : 'An unexpected error occurred');
-    }
+    const quiz: Quiz = {
+      id: v4(),
+      title: quizTitle.trim(),
+      description: quizDescription.trim(),
+      questions: [],
+    };
+
+    addQuiz(quiz);
+
+    console.log('Quiz created successfully:', quiz);
+    onSuccessCallback(quiz);
 
     setIsCreating(false);
   };
@@ -67,12 +71,6 @@ export function NewQuizForm({ onQuizCreated }: NewQuizFormProps) {
               disabled={isCreating}
             />
           </div>
-
-          {error && (
-            <div className="p-4 bg-red-50 border border-red-200 rounded-xl">
-              <p className="text-red-600 text-sm font-medium">{error}</p>
-            </div>
-          )}
 
           <Button
             type="submit"

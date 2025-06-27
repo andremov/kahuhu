@@ -6,38 +6,112 @@ import { ResultsScreen } from './components/screens/results-screen';
 import { FinalResultsScreen } from './components/screens/final-results-screen';
 import { CreateQuizScreen } from './components/screens/create-quiz-screen';
 // import { LoadingSpinner } from './components/ui/loading-spinner';
-import { useGameState } from './hooks/use-game-state';
 import { Quiz } from './utils/types';
 import { QuizListScreen } from './components/screens/quiz-list-screen';
+import { useSocket } from './hooks/use-socket';
+import { useAppStore } from './store/app-store';
 
 export default function App() {
-  const [hasAnswered, setHasAnswered] = useState(false);
-
-  const {
-    appState,
-    gameState,
-    playerId,
-    isHost,
-    questionResult,
-    finalResults,
-    error,
-    isConnected,
-
-    setAppState,
-    createGame,
-    joinGame,
-    startGame,
-    submitAnswer,
-    nextQuestion,
-    resetGame,
-  } = useGameState();
+  // const [hasAnswered, setHasAnswered] = useState(false);
+  const { setCurrentScreen, currentScreen } = useAppStore();
+  // const { socket, isConnected, createGame, joinGame, startGame, submitAnswer, nextQuestion } =
+  //   useSocket();
 
   // Handle connection state
-  useEffect(() => {
-    if (isConnected && appState === 'connecting') {
-      setAppState('home');
-    }
-  }, [isConnected, appState]);
+  // useEffect(() => {
+  //   if (isConnected && appState === 'connecting') {
+  //     setAppState('home');
+  //   }
+  // }, [isConnected, appState]);
+
+  // useEffect(() => {
+  //   if (!socket) return;
+
+  //   // Game creation events
+  //   socket.on('game-created', ({ gameCode, gameState: newGameState }) => {
+  //     console.log('Game created:', gameCode);
+  //     setGameState(newGameState);
+  //     setIsHost(true);
+  //     setError(null);
+  //   });
+
+  //   // Game joining events
+  //   socket.on('game-joined', ({ playerId: newPlayerId, gameState: newGameState }) => {
+  //     console.log('Game joined:', newPlayerId);
+  //     setPlayerId(newPlayerId);
+  //     setGameState(newGameState);
+  //     setIsHost(false);
+  //     setError(null);
+  //   });
+
+  //   socket.on('join-error', ({ message }) => {
+  //     setError(message);
+  //   });
+
+  //   // Player management events
+  //   socket.on('player-joined', (newGameState) => {
+  //     setGameState(newGameState);
+  //   });
+
+  //   socket.on('player-left', (newGameState) => {
+  //     setGameState(newGameState);
+  //   });
+
+  //   // Game flow events
+  //   socket.on('game-started', (newGameState) => {
+  //     setGameState(newGameState);
+  //     setQuestionResult(null);
+  //     setFinalResults(null);
+  //   });
+
+  //   socket.on('time-update', ({ timeRemaining }) => {
+  //     setGameState((prev) => (prev ? { ...prev, timeRemaining } : null));
+  //   });
+
+  //   socket.on('answer-submitted', ({ answerIndex, isCorrect, score, totalScore }) => {
+  //     console.log('Answer submitted:', { answerIndex, isCorrect, score, totalScore });
+  //   });
+
+  //   socket.on('question-ended', (result: QuestionResult) => {
+  //     setQuestionResult(result);
+  //     setGameState((prev) => (prev ? { ...prev, gameState: 'results' } : null));
+  //   });
+
+  //   socket.on('next-question', (newGameState) => {
+  //     setGameState(newGameState);
+  //     setQuestionResult(null);
+  //   });
+
+  //   socket.on('game-ended', (results: FinalResults) => {
+  //     setFinalResults(results);
+  //     setGameState((prev) => (prev ? { ...prev, gameState: 'final' } : null));
+  //   });
+
+  //   socket.on('host-disconnected', () => {
+  //     setError('Host disconnected. Game ended.');
+  //     resetGame();
+  //   });
+
+  //   socket.on('error', ({ message }) => {
+  //     setError(message);
+  //   });
+
+  //   return () => {
+  //     socket.off('game-created');
+  //     socket.off('game-joined');
+  //     socket.off('join-error');
+  //     socket.off('player-joined');
+  //     socket.off('player-left');
+  //     socket.off('game-started');
+  //     socket.off('time-update');
+  //     socket.off('answer-submitted');
+  //     socket.off('question-ended');
+  //     socket.off('next-question');
+  //     socket.off('game-ended');
+  //     socket.off('host-disconnected');
+  //     socket.off('error');
+  //   };
+  // }, [socket]);
 
   // Handle game state changes
   // useEffect(() => {
@@ -66,68 +140,41 @@ export default function App() {
   // }, [gameState?.gameState, appState]);
 
   const handleJoinGameSubmit = (gameCode: string, playerName: string) => {
-    joinGame(gameCode, playerName);
+    // joinGame(gameCode, playerName);
   };
 
-  const handleStartGame = () => {
-    startGame();
-  };
+  // const handleStartGame = () => {
+  //   startGame();
+  // };
 
-  const handleSubmitAnswer = (answerIndex: number) => {
-    submitAnswer(answerIndex);
-    setHasAnswered(true);
-  };
+  // const handleSubmitAnswer = (answerIndex: number) => {
+  //   submitAnswer(answerIndex);
+  //   setHasAnswered(true);
+  // };
 
-  const handleNextQuestion = () => {
-    nextQuestion();
-  };
+  // const handleNextQuestion = () => {
+  //   nextQuestion();
+  // };
 
-  const handleGoHome = () => {
-    resetGame();
-    setAppState('home');
-  };
+  // const handleGoHome = () => {
+  //   resetGame();
+  //   setAppState('home');
+  // };
 
-  const handleLeaveGame = () => {
-    resetGame();
-    setAppState('home');
-  };
+  // const handleLeaveGame = () => {
+  //   resetGame();
+  //   setAppState('home');
+  // };
 
   return (
-    <div className="min-h-screen bg-gradient-[40deg,purple_10%,pink_50%,orange_90%]">
-      {appState === 'home' && (
-        <HomeScreen
-          onCreateGame={() => setAppState('create-game')}
-          onCreateQuiz={() => setAppState('create-quiz')}
-          onListQuizzes={() => setAppState('list-quizzes')}
-          onJoinGame={handleJoinGameSubmit}
-          error={error}
-        />
-      )}
+    <div
+      className={`min-h-screen transition-all ${currentScreen === 'home' ? 'bg-linear-[27deg] from-purple-600 via-pink-500 to-orange-400' : 'bg-linear-[43deg] from-blue-600 via-teal-500 to-green-400'}`}
+    >
+      {currentScreen === 'home' && <HomeScreen onJoinGame={handleJoinGameSubmit} />}
 
-      {appState === 'create-quiz' && (
-        <CreateQuizScreen
-          onBack={() => setAppState('list-quizzes')}
-          // quizId={selectedQuizId} // Pass the selected quiz ID if editing
-        />
-      )}
+      {currentScreen === 'create-quiz' && <CreateQuizScreen />}
 
-      {appState === 'list-quizzes' && (
-        <QuizListScreen
-          onBack={() => setAppState('home')}
-          onCreateQuiz={() => setAppState('create-quiz')}
-          onHostQuiz={(quizId: string) => {
-            // createGame(quizId);
-            // setAppState('lobby');
-          }}
-          onEditQuiz={(quizId: string) => {
-            setAppState('create-quiz');
-            // Navigate to edit quiz screen (not implemented in this example)
-          }}
-          onDeleteQuiz={(quizId: string) => {
-            // Handle quiz deletion (not implemented in this example)
-          }}
-        />
-      )}
+      {currentScreen === 'list-quizzes' && <QuizListScreen />}
     </div>
   );
 

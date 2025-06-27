@@ -45,7 +45,7 @@ export async function getQuizById(quizId: string) {
 
     const questions: Question[] = await Question.find({ parentQuiz: quizId });
 
-    return { ...quiz, questions };
+    return { ...JSON.parse(JSON.stringify(quiz)), questions };
   } catch (error) {
     console.error(`Failed to get quiz by ID ${quizId}:`, error);
   }
