@@ -5,11 +5,12 @@ import joinGameSocketEvent from './join-game';
 import nextQuestionSocketEvent from './next-question';
 import startGameSocketEvent from './start-game';
 import submitAnswerSocketEvent from './submit-answer';
+import { Quiz } from '../utils/types';
 
 export default function onSocketConnection(io: Server, socket: Socket) {
   console.log('User connected:', socket.id);
 
-  socket.on('create-game', (quizId: string) => createGameSocketEvent(io, socket, quizId));
+  socket.on('create-game', (quiz: Quiz) => createGameSocketEvent(io, socket, quiz));
 
   socket.on('join-game', ({ gameCode, playerName }: { gameCode: string; playerName: string }) =>
     joinGameSocketEvent(io, socket, { gameCode, playerName })

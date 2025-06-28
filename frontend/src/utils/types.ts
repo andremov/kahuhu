@@ -1,3 +1,5 @@
+import { Temporal } from '@js-temporal/polyfill';
+
 export interface Question {
   id: string;
   statement: string;
@@ -25,14 +27,18 @@ export interface Player {
   joinedAt: Date;
 }
 
-export interface GameState {
+export interface Game {
   id: string;
   code: string;
-  quiz: Quiz;
+  quizId: string;
+  quizData: Quiz;
   players: Player[];
+  hostId: string;
   currentQuestionIndex: number;
   gameState: 'lobby' | 'question' | 'results' | 'final';
   timeRemaining: number;
+  questionStartTime: Temporal.PlainDateTime | null;
+  createdAt: Temporal.PlainDateTime;
 }
 
 export interface QuestionResult {
