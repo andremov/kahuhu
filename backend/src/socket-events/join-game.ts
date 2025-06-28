@@ -10,6 +10,7 @@ export default function joinGameSocketEvent(
     const result = joinGame(gameCode, playerName, socket.id);
 
     if (!result) {
+      console.warn(`Game not found or already started for code: ${gameCode}`);
       socket.emit('join-error', {
         message: 'Game not found or already started',
       });

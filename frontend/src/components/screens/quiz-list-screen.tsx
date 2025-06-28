@@ -8,7 +8,7 @@ interface QuizListScreenProps {
   onHostGame: (quizId?: string) => void;
 }
 
-export function QuizListScreen({ onHostGame }: QuizListScreenProps) {
+export default function QuizListScreen({ onHostGame }: QuizListScreenProps) {
   const { loadedQuizzes, setCurrentScreen, setEditingQuizId, removeQuiz, addQuiz } = useAppStore();
 
   const downloadQuiz = (quizId: string) => {

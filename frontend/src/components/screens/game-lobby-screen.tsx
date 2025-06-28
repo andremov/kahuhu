@@ -7,8 +7,9 @@ interface GameLobbyScreenProps {
   onStartGame: () => void;
 }
 
-export function GameLobbyScreen({ onStartGame }: GameLobbyScreenProps) {
-  const { gameState, setCurrentScreen, setGamePhase, isHost } = useAppStore();
+export default function GameLobbyScreen({ onStartGame }: GameLobbyScreenProps) {
+  const { gameState, setCurrentScreen, setGamePhase, isHost, playerId, setGameState } =
+    useAppStore();
   const [copied, setCopied] = useState(false);
 
   const copyGameCode = async () => {
@@ -26,20 +27,25 @@ export function GameLobbyScreen({ onStartGame }: GameLobbyScreenProps) {
     }
   };
 
+  const onLeaveGame = () => {
+    setCurrentScreen('home');
+    setGamePhase(null);
+    setGameState(null);
+  };
+
   useEffect(() => {
     if (!gameState) {
       setCurrentScreen('home');
       setGamePhase(null);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   if (!gameState) {
     return <></>;
   }
 
-  const sortedPlayers = [...gameState.players].sort(
-    (a, b) => a.joinedAt.getTime() - b.joinedAt.getTime()
-  );
+  const sortedPlayers = [...gameState.players].sort((a, b) => a.joinedAt.since(b.joinedAt).seconds);
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -105,11 +111,11 @@ export function GameLobbyScreen({ onStartGame }: GameLobbyScreenProps) {
                   <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full flex items-center justify-center text-white font-bold">
                     {player.name.charAt(0).toUpperCase()}
                   </div>
-                  <div className="flex-1">
+                  <div className="flex-1 flex gap-1">
                     <div className="font-semibold text-gray-800">{player.name}</div>
-                    <div className="text-sm text-gray-500">
-                      Joined {player.joinedAt.toLocaleTimeString()}
-                    </div>
+                    {player.id === playerId && (
+                      <div className="font-semibold text-gray-300">(You)</div>
+                    )}
                   </div>
                   <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse" />
                 </div>
@@ -120,28 +126,30 @@ export function GameLobbyScreen({ onStartGame }: GameLobbyScreenProps) {
       </div>
 
       {/* Quiz Info */}
-      <div className="max-w-md mx-auto mb-8">
-        <div className="bg-white/95 backdrop-blur-sm rounded-3xl p-6 shadow-2xl text-center">
-          <h3 className="text-lg font-semibold text-gray-800 mb-4">Quiz Details</h3>
-          <div className="grid grid-cols-2 gap-4 text-sm">
-            <div className="bg-purple-50 p-3 rounded-xl">
-              <div className="text-2xl font-bold text-purple-600">
-                {gameState.quizData.questions.length}
+      {!isHost && (
+        <div className="max-w-md mx-auto mb-8">
+          <div className="bg-white/95 backdrop-blur-sm rounded-3xl p-6 shadow-2xl text-center">
+            <h3 className="text-lg font-semibold text-gray-800 mb-4">Quiz Details</h3>
+            <div className="grid grid-cols-2 gap-4 text-sm">
+              <div className="bg-purple-50 p-3 rounded-xl">
+                <div className="text-2xl font-bold text-purple-600">
+                  {gameState.quizData.questions.length}
+                </div>
+                <div className="text-gray-600">Questions</div>
               </div>
-              <div className="text-gray-600">Questions</div>
-            </div>
-            <div className="bg-pink-50 p-3 rounded-xl">
-              <div className="text-2xl font-bold text-pink-600">
-                ~
-                {Math.ceil(
-                  gameState.quizData.questions.reduce((acc, q) => acc + q.timeLimit, 0) / 60
-                )}
+              <div className="bg-pink-50 p-3 rounded-xl">
+                <div className="text-2xl font-bold text-pink-600">
+                  ~
+                  {Math.ceil(
+                    gameState.quizData.questions.reduce((acc, q) => acc + q.timeLimit, 0) / 60
+                  )}
+                </div>
+                <div className="text-gray-600">Minutes</div>
               </div>
-              <div className="text-gray-600">Minutes</div>
             </div>
           </div>
         </div>
-      </div>
+      )}
 
       {/* Action Buttons */}
       <div className="max-w-md mx-auto space-y-4">
@@ -156,6 +164,9 @@ export function GameLobbyScreen({ onStartGame }: GameLobbyScreenProps) {
             Start Game
           </Button>
         )}
+        <Button onClick={onLeaveGame} variant="secondary" size="lg" className="w-full">
+          Leave Game
+        </Button>
       </div>
     </div>
   );

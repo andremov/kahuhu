@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { Game, Quiz } from '../utils/types';
+import { Temporal } from '@js-temporal/polyfill';
 
 type ScreenOptions = 'home' | 'create-quiz' | 'create-game' | 'list-quizzes' | 'in-game';
 
@@ -110,8 +111,21 @@ export const useAppStore = create<AppState>()(
       setPlayerName: (newName) => set({ playerName: newName }),
 
       gameState: null,
-      setGameState: (newGameState) => set({ gameState: newGameState }),
+      setGameState: (newGameState: Game | null) => {
+        if (!newGameState) {
+          return set({ gameState: null });
+        }
 
+        set({
+          gameState: {
+            ...newGameState,
+            players: newGameState.players.map((p) => ({
+              ...p,
+              joinedAt: Temporal.PlainDateTime.from(p.joinedAt),
+            })),
+          },
+        });
+      },
       joinedGameCode: null,
       setJoinedGameCode: (gameCode) => set({ joinedGameCode: gameCode }),
     }),

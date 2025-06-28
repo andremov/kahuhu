@@ -17,14 +17,13 @@ export interface Quiz {
   title: string;
   description: string;
   questions: Question[];
-  createdAt?: Date;
 }
 
 export interface Player {
   id: string;
   name: string;
   score: number;
-  joinedAt: Date;
+  joinedAt: Temporal.PlainDateTime;
 }
 
 export interface Game {

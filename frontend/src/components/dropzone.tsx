@@ -74,7 +74,6 @@ export function Dropzone({ onQuizAdded, existingQuizIds, className = '' }: Dropz
             id: (question.id as string) || v4(),
           };
         }),
-        createdAt: quizData.createdAt || new Date(),
       };
 
       onQuizAdded(newQuiz);

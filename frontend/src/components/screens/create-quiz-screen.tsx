@@ -6,7 +6,7 @@ import { useAppStore } from '../../store/app-store';
 import { useState } from 'react';
 import { NewQuestionForm } from '../forms/new-question-form';
 
-export function CreateQuizScreen() {
+export default function CreateQuizScreen() {
   const { setCurrentScreen, editingQuizId, setEditingQuizId, getEditingQuiz } = useAppStore();
   const [creatingQuestion, setCreatingQuestion] = useState(false);
 

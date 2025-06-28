@@ -7,7 +7,7 @@ interface HomeScreenProps {
   onHostGame: () => void;
 }
 
-export function HomeScreen({ onJoinGame, onHostGame }: HomeScreenProps) {
+export default function HomeScreen({ onJoinGame, onHostGame }: HomeScreenProps) {
   const { setCurrentScreen } = useAppStore();
 
   return (
@@ -28,7 +28,7 @@ export function HomeScreen({ onJoinGame, onHostGame }: HomeScreenProps) {
         <JoinForm onJoinGame={onJoinGame} />
       </div>
 
-      <div className="grid md:grid-cols-3 gap-4 max-w-lg mx-auto">
+      <div className="hidden md:grid md:grid-cols-3 gap-4 max-w-lg mx-auto">
         <button
           className="group text-center text-white transition hover:scale-105 hover:bg-white/30 bg-transparent w-fit mx-auto p-6 rounded-3xl hover:shadow-lg select-none cursor-pointer"
           onClick={onHostGame}

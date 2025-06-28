@@ -40,8 +40,9 @@ export const useSocket = (): UseSocketReturn => {
     });
 
     return () => {
-      socket.disconnect();
+      if (isConnected) socket.disconnect();
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const createGame = (quiz: Quiz) => {
@@ -55,24 +56,32 @@ export const useSocket = (): UseSocketReturn => {
   const joinGame = (gameCode: string, playerName: string) => {
     if (socketRef.current) {
       socketRef.current.emit('join-game', { gameCode, playerName });
+    } else {
+      console.error('Socket is not initialized. Could not join game.');
     }
   };
 
   const startGame = () => {
     if (socketRef.current) {
       socketRef.current.emit('start-game');
+    } else {
+      console.error('Socket is not initialized. Could not start game.');
     }
   };
 
   const submitAnswer = (answerIndex: number) => {
     if (socketRef.current) {
       socketRef.current.emit('submit-answer', { answerIndex });
+    } else {
+      console.error('Socket is not initialized. Could not submit answer.');
     }
   };
 
   const nextQuestion = () => {
     if (socketRef.current) {
       socketRef.current.emit('next-question');
+    } else {
+      console.error('Socket is not initialized. Could not go to next question.');
     }
   };
 

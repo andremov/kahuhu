@@ -2,13 +2,15 @@ import { ArrowLeft, ListChecks, Play } from 'lucide-react';
 import { useAppStore } from '../../store/app-store';
 import { Button } from '../button';
 import { Quiz } from '../../utils/types';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
+import { LoadingSpinner } from '../ui/loading-spinner';
 
 type CreateGameScreenProps = {
+  isConnected: boolean;
   onCreateGame: (quiz: Quiz) => void;
 };
 
-export default function CreateGameScreen({ onCreateGame }: CreateGameScreenProps) {
+export default function CreateGameScreen({ onCreateGame, isConnected }: CreateGameScreenProps) {
   const {
     setGamePhase,
     loadedQuizzes,
@@ -17,6 +19,7 @@ export default function CreateGameScreen({ onCreateGame }: CreateGameScreenProps
     hostingQuizId,
     getHostingQuiz,
   } = useAppStore();
+  const [quizPreselected, setQuizPreselected] = useState<boolean | null>(null);
 
   const handleCreateGame = () => {
     const quiz = getHostingQuiz();
@@ -32,13 +35,38 @@ export default function CreateGameScreen({ onCreateGame }: CreateGameScreenProps
   };
 
   useEffect(() => {
-    if (!hostingQuizId) return;
-
-    setTimeout(() => {
-      handleCreateGame();
-    }, 100);
+    setQuizPreselected(hostingQuizId !== null);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  useEffect(() => {
+    if (quizPreselected && isConnected) {
+      handleCreateGame();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [quizPreselected, isConnected]);
+
+  if (quizPreselected === null) {
+    return (
+      <div className="w-full min-h-screen flex items-center justify-center">
+        <div className="flex flex-col items-center justify-center space-y-4">
+          <LoadingSpinner />
+          <p className="text-white font-semibold text-xl">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (quizPreselected === true) {
+    return (
+      <div className="w-full min-h-screen flex items-center justify-center">
+        <div className="flex flex-col items-center justify-center space-y-4">
+          <LoadingSpinner />
+          <p className="text-white font-semibold text-xl">Creating game...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="container mx-auto px-4 py-8">
