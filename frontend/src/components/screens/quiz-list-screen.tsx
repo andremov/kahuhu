@@ -1,10 +1,34 @@
-import { ArrowLeft, ListOrdered, Pencil, Play, PlusCircle, Trash2 } from 'lucide-react';
+import { ArrowLeft, Download, ListOrdered, Pencil, Play, PlusCircle, Trash2 } from 'lucide-react';
 import { Button } from '../ui/button';
 import { useAppStore } from '../../store/app-store';
+import { Dropzone } from '../dropzone';
+import { Quiz } from '../../utils/types';
 
-export function QuizListScreen() {
-  const { loadedQuizzes, setCurrentScreen, setEditingQuizId, setHostingQuizId, removeQuiz } =
-    useAppStore();
+interface QuizListScreenProps {
+  onHostGame: (quizId?: string) => void;
+}
+
+export function QuizListScreen({ onHostGame }: QuizListScreenProps) {
+  const { loadedQuizzes, setCurrentScreen, setEditingQuizId, removeQuiz, addQuiz } = useAppStore();
+
+  const downloadQuiz = (quizId: string) => {
+    const quiz = loadedQuizzes.find((q) => q.id === quizId);
+    if (!quiz) return;
+
+    const blob = new Blob([JSON.stringify(quiz, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${quiz.title}.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
+
+  const handleQuizAdded = (quiz: Quiz) => {
+    addQuiz(quiz);
+  };
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -35,13 +59,17 @@ export function QuizListScreen() {
             <p className="text-gray-700">{quiz.description}</p>
 
             <div className="flex gap-4 mt-6 justify-end">
-              <Button
-                variant="primary"
-                disabled
-                onClick={() => setHostingQuizId(quiz.id)}
-                icon={Play}
-              >
+              <Button variant="primary" onClick={() => onHostGame(quiz.id)} icon={Play}>
                 <p>Host</p>
+              </Button>
+
+              <Button
+                type="button"
+                variant="secondary"
+                onClick={() => downloadQuiz(quiz.id)}
+                icon={Download}
+              >
+                <p>Download</p>
               </Button>
 
               <Button
@@ -55,12 +83,15 @@ export function QuizListScreen() {
                 <p>Edit</p>
               </Button>
 
-              <Button variant="danger" disabled onClick={() => removeQuiz(quiz.id)} icon={Trash2}>
+              <Button variant="danger" onClick={() => removeQuiz(quiz.id)} icon={Trash2}>
                 <p>Delete</p>
               </Button>
             </div>
           </div>
         ))}
+
+        {/* Drag and drop zone to add quizzes */}
+        <Dropzone onQuizAdded={handleQuizAdded} existingQuizIds={loadedQuizzes.map((q) => q.id)} />
 
         <Button
           className="w-full max-w-md mx-auto"

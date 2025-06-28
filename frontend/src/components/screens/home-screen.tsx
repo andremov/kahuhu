@@ -4,10 +4,10 @@ import { useAppStore } from '../../store/app-store';
 
 interface HomeScreenProps {
   onJoinGame: (gameCode: string, playerName: string) => void;
-  error?: string | null;
+  onHostGame: () => void;
 }
 
-export function HomeScreen({ onJoinGame, error }: HomeScreenProps) {
+export function HomeScreen({ onJoinGame, onHostGame }: HomeScreenProps) {
   const { setCurrentScreen } = useAppStore();
 
   return (
@@ -25,13 +25,13 @@ export function HomeScreen({ onJoinGame, error }: HomeScreenProps) {
       {/* Main Actions */}
       <div className="grid md:grid-rows-1 gap-8 max-w-4xl mx-auto mb-12">
         {/* Join Game */}
-        <JoinForm onJoinGame={onJoinGame} error={error} />
+        <JoinForm onJoinGame={onJoinGame} />
       </div>
 
       <div className="grid md:grid-cols-3 gap-4 max-w-lg mx-auto">
         <button
           className="group text-center text-white transition hover:scale-105 hover:bg-white/30 bg-transparent w-fit mx-auto p-6 rounded-3xl hover:shadow-lg select-none cursor-pointer"
-          onClick={() => {}}
+          onClick={onHostGame}
         >
           <div className="w-12 h-12 bg-white/20 rounded-2xl flex items-center justify-center mx-auto mb-3 transition group-hover:bg-transparent">
             <Plus className="w-6 h-6" />

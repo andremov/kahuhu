@@ -27,15 +27,22 @@ interface AppState {
   setHostingQuizId: (quizId: string | null) => void;
   getHostingQuiz: () => Quiz | undefined;
 
-  // playerId: string | null;
-  // isHost: boolean;
+  isHost: boolean;
+  setIsHost: (isHost: boolean) => void;
+
+  playerId: string | null;
+  setPlayerId: (newId: string | null) => void;
+  playerName: string | null;
+  setPlayerName: (newName: string | null) => void;
+  gameCode: string | null;
+  setGameCode: (newCode: string | null) => void;
+
+  isConnected: boolean;
+  setConnected: (connected: boolean) => void;
+
   // questionResult: QuestionResult | null;
   // finalResults: FinalResults | null;
-  // error: string | null;
-  // isConnected: boolean;
-  // selectedQuizId: string | null;
 
-  // setSelectedQuizId: (newId: string | null) => void;
   // createGame: (quiz: any) => void;
   // joinGame: (gameCode: string, playerName: string) => void;
   // startGame: () => void;
@@ -91,18 +98,18 @@ export const useAppStore = create<AppState>()(
         return loadedQuizzes.find((quiz) => quiz.id === hostingQuizId);
       },
 
-      // playerId: null,
-      // setPlayerId: (newId) => set({ selectedQuizId: newId }),
-      // isHost: false,
-      // setIsHost: (newId) => set({ selectedQuizId: newId }),
-      // questionResult: null,
-      // setQuestionResult: (newId) => set({ selectedQuizId: newId }),
-      // finalResults: null,
-      // setFinalResults: (newId) => set({ selectedQuizId: newId }),
-      // error: null,
-      // setError: (newId) => set({ selectedQuizId: newId }),
-      // selectedQuizId: null,
-      // setSelectedQuizId: (newId) => set({ selectedQuizId: newId }),
+      isHost: false,
+      setIsHost: (isHost) => set({ isHost }),
+
+      playerId: null,
+      setPlayerId: (newId) => set({ playerId: newId }),
+      playerName: null,
+      setPlayerName: (newName) => set({ playerName: newName }),
+      gameCode: null,
+      setGameCode: (newCode) => set({ gameCode: newCode }),
+
+      isConnected: false,
+      setConnected: (connected) => set({ isConnected: connected }),
     }),
     {
       name: 'kahuhu-app-storage',
