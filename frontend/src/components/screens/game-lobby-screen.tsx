@@ -1,21 +1,8 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Play, Users, Copy, Check, Crown } from 'lucide-react';
 import { Button } from '../ui/button';
-import { GameState } from '../../utils/types';
 
-interface GameLobbyScreenProps {
-  gameState: GameState;
-  isHost: boolean;
-  onStartGame: () => void;
-  onLeaveGame: () => void;
-}
-
-export const GameLobbyScreen: React.FC<GameLobbyScreenProps> = ({
-  gameState,
-  isHost,
-  onStartGame,
-  onLeaveGame,
-}) => {
+export function GameLobbyScreen() {
   const [copied, setCopied] = useState(false);
 
   const copyGameCode = async () => {
@@ -166,4 +153,4 @@ export const GameLobbyScreen: React.FC<GameLobbyScreenProps> = ({
       </div>
     </div>
   );
-};
+}

@@ -4,10 +4,9 @@ import { UserPlus } from 'lucide-react';
 
 type JoinFormProps = {
   onJoinGame: (gameCode: string, playerName: string) => void;
-  error?: string | null;
 };
 
-export function JoinForm({ onJoinGame, error }: JoinFormProps) {
+export function JoinForm({ onJoinGame }: JoinFormProps) {
   const [gameCode, setGameCode] = useState('');
   const [playerName, setPlayerName] = useState('');
   const [isJoining, setIsJoining] = useState(false);
@@ -65,12 +64,6 @@ export function JoinForm({ onJoinGame, error }: JoinFormProps) {
               disabled={isJoining}
             />
           </div>
-
-          {error && (
-            <div className="p-4 bg-red-50 border border-red-200 rounded-xl">
-              <p className="text-red-600 text-sm font-medium">{error}</p>
-            </div>
-          )}
 
           <Button
             type="submit"
