@@ -1,12 +1,12 @@
 import { useEffect, useRef, useState } from 'react';
 import { io, Socket } from 'socket.io-client';
 import { getConfigValue } from '../utils/config';
-// import { GameState, QuestionResult, FinalResults } from '../utils/types';
+import { Quiz } from '../utils/types';
 
 interface UseSocketReturn {
   socket: Socket | null;
   isConnected: boolean;
-  createGame: (quiz: any) => void;
+  createGame: (quiz: Quiz) => void;
   joinGame: (gameCode: string, playerName: string) => void;
   startGame: () => void;
   submitAnswer: (answerIndex: number) => void;
@@ -44,9 +44,11 @@ export const useSocket = (): UseSocketReturn => {
     };
   }, []);
 
-  const createGame = (quiz: any) => {
+  const createGame = (quiz: Quiz) => {
     if (socketRef.current) {
       socketRef.current.emit('create-game', quiz);
+    } else {
+      console.error('Socket is not initialized. Could not create game.');
     }
   };
 

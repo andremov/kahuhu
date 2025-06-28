@@ -4,7 +4,7 @@ export interface Game {
   id: string;
   code: string;
   quizId: string;
-  quizData?: Quiz & { questions: Question[] };
+  quizData: Quiz;
   players: Player[];
   hostId: string;
   currentQuestionIndex: number;
@@ -24,18 +24,22 @@ export interface Player {
   gameCode: string;
 }
 
+export interface Question {
+  id: string;
+  statement: string;
+  options: QuestionOption[];
+  timeLimit: number;
+}
+
+export interface QuestionOption {
+  text: string;
+  points: number;
+}
+
 export interface Quiz {
   id: string;
   title: string;
   description: string;
   questions: Question[];
-}
-
-export interface Question {
-  id: string;
-  parentQuiz: string;
-  statement: string;
-  options: string[];
-  correctAnswer: number;
-  points: number;
+  createdAt?: Date;
 }

@@ -20,9 +20,15 @@ export default function submitAnswerSocketEvent(
     player.answers[game.currentQuestionIndex] = Number(answerIndex);
 
     // Calculate score
-    const currentQuestion = game.quizData!.questions[game.currentQuestionIndex];
-    const isCorrect = Number(answerIndex) === currentQuestion.correctAnswer;
-    const questionScore = calculateScore(isCorrect, game.timeRemaining, 60, currentQuestion.points);
+    const currentQuestion = game.quizData.questions[game.currentQuestionIndex];
+    const answerPoints = currentQuestion.options[Number(answerIndex)].points;
+    const isCorrect = answerPoints > 0;
+    const questionScore = calculateScore(
+      isCorrect,
+      game.timeRemaining,
+      currentQuestion.timeLimit,
+      answerPoints
+    );
 
     player.score += questionScore;
 

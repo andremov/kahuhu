@@ -21,13 +21,13 @@ export const handleQuestionEnd = (io: Server, game: Game) => {
   const currentQuestion = game.quizData!.questions[game.currentQuestionIndex];
   const questionResults = {
     questionIndex: game.currentQuestionIndex,
-    correctAnswer: currentQuestion.correctAnswer,
-    correctAnswerText: currentQuestion.options[currentQuestion.correctAnswer],
+    // correctAnswer: currentQuestion.correctAnswer,
+    // correctAnswerText: currentQuestion.options[currentQuestion.correctAnswer],
     playerResults: Array.from(game.players.values()).map((player) => ({
       id: player.id,
       name: player.name,
       answer: player.answers[game.currentQuestionIndex],
-      isCorrect: player.answers[game.currentQuestionIndex] === currentQuestion.correctAnswer,
+      // isCorrect: player.answers[game.currentQuestionIndex] === currentQuestion.correctAnswer,
       score: player.score,
     })),
   };
@@ -83,9 +83,9 @@ export const getFinalResults = (game: Game) => {
       name: player.name,
       score: player.score,
       position: index + 1,
-      correctAnswers: player.answers.filter(
-        (answer, qIndex) => answer === game.quizData!.questions[qIndex].correctAnswer
-      ).length,
+      // correctAnswers: player.answers.filter(
+      //   (answer, qIndex) => answer === game.quizData!.questions[qIndex].correctAnswer
+      // ).length,
     })),
   };
 };

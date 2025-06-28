@@ -9,17 +9,17 @@ export default function App() {
   const {
     setCurrentScreen,
     currentScreen,
-    setGameState,
+    setGamePhase,
     setHostingQuizId,
     setPlayerName,
-    setGameCode,
+    setJoinedGameCode,
   } = useAppStore();
 
   const handleJoinGameSubmit = (gameCode: string, playerName: string) => {
-    setGameCode(gameCode);
+    setJoinedGameCode(gameCode);
     setPlayerName(playerName);
     setCurrentScreen('in-game');
-    setGameState('lobby');
+    setGamePhase('connecting');
   };
 
   const handleHostGameSubmit = (quizId?: string) => {
@@ -27,7 +27,7 @@ export default function App() {
       setHostingQuizId(quizId);
     }
     setCurrentScreen('in-game');
-    setGameState('lobby');
+    setGamePhase('creating');
   };
 
   return (

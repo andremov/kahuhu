@@ -1,17 +1,19 @@
 import { v4 as uuidv4 } from 'uuid';
-import { Game, Player } from '../utils/types';
+import { Game, Player, Quiz } from '../utils/types';
 import { Temporal } from '@js-temporal/polyfill';
+import { time } from 'console';
 
 const games = new Map<string, Game>();
 
-export function createGame(quizId: string, hostSocketId: string) {
+export function createGame(quiz: Quiz, hostSocketId: string) {
   const gameCode = Math.random().toString(36).substring(2, 8).toUpperCase();
   const gameId = uuidv4();
 
   const game: Game = {
     id: gameId,
     code: gameCode,
-    quizId: quizId,
+    quizId: quiz.id,
+    quizData: quiz,
     players: [],
     hostId: hostSocketId,
     currentQuestionIndex: 0,
@@ -56,7 +58,7 @@ export function getGameState(game: Game) {
   return {
     id: game.id,
     code: game.code,
-    quiz: {
+    quizData: {
       id: game.quizData!.id,
       title: game.quizData!.title,
       description: game.quizData!.description,
@@ -64,7 +66,7 @@ export function getGameState(game: Game) {
         id: q.id,
         statement: q.statement,
         options: q.options,
-        points: q.points,
+        timeLimit: q.timeLimit,
       })),
     },
     players: game.players.map((p) => ({
@@ -105,6 +107,15 @@ export function getPlayerBySocketId(socketId: string) {
     const player = game.players.find((p) => p.socketId === socketId);
     if (player) {
       return player;
+    }
+  }
+  return null;
+}
+
+export function getGameByHostSocketId(hostSocketId: string) {
+  for (const game of games.values()) {
+    if (game.hostId === hostSocketId) {
+      return game;
     }
   }
   return null;

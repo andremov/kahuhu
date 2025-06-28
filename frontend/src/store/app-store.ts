@@ -1,17 +1,17 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { Quiz } from '../utils/types';
+import { Game, Quiz } from '../utils/types';
 
 type ScreenOptions = 'home' | 'create-quiz' | 'create-game' | 'list-quizzes' | 'in-game';
 
-type GamePhase = 'lobby' | 'question' | 'results' | 'final' | 'connecting';
+type GamePhase = 'lobby' | 'question' | 'results' | 'final' | 'connecting' | 'creating';
 
 interface AppState {
   currentScreen: ScreenOptions;
   setCurrentScreen: (state: ScreenOptions) => void;
 
-  gameState: GamePhase | null;
-  setGameState: (newState: GamePhase | null) => void;
+  gamePhase: GamePhase | null;
+  setGamePhase: (newState: GamePhase | null) => void;
 
   loadedQuizzes: Quiz[];
   addQuiz: (quiz: Quiz) => void;
@@ -34,11 +34,14 @@ interface AppState {
   setPlayerId: (newId: string | null) => void;
   playerName: string | null;
   setPlayerName: (newName: string | null) => void;
-  gameCode: string | null;
-  setGameCode: (newCode: string | null) => void;
 
-  isConnected: boolean;
-  setConnected: (connected: boolean) => void;
+  joinedGameCode: string | null;
+  setJoinedGameCode: (gameCode: string | null) => void;
+
+  gameState: Game | null;
+  setGameState: (newGameState: Game | null) => void;
+
+  // playerList: string[]
 
   // questionResult: QuestionResult | null;
   // finalResults: FinalResults | null;
@@ -54,8 +57,8 @@ interface AppState {
 export const useAppStore = create<AppState>()(
   persist(
     (set, get) => ({
-      gameState: null,
-      setGameState: (newGameState) => set({ gameState: newGameState }),
+      gamePhase: null,
+      setGamePhase: (newGameState) => set({ gamePhase: newGameState }),
 
       currentScreen: 'home',
       setCurrentScreen: (newScreen) => set({ currentScreen: newScreen }),
@@ -105,11 +108,12 @@ export const useAppStore = create<AppState>()(
       setPlayerId: (newId) => set({ playerId: newId }),
       playerName: null,
       setPlayerName: (newName) => set({ playerName: newName }),
-      gameCode: null,
-      setGameCode: (newCode) => set({ gameCode: newCode }),
 
-      isConnected: false,
-      setConnected: (connected) => set({ isConnected: connected }),
+      gameState: null,
+      setGameState: (newGameState) => set({ gameState: newGameState }),
+
+      joinedGameCode: null,
+      setJoinedGameCode: (gameCode) => set({ joinedGameCode: gameCode }),
     }),
     {
       name: 'kahuhu-app-storage',
