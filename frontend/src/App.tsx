@@ -1,6 +1,6 @@
-import { HomeScreen } from './components/screens/home-screen';
-import { CreateQuizScreen } from './components/screens/create-quiz-screen';
-import { QuizListScreen } from './components/screens/quiz-list-screen';
+import HomeScreen from './components/screens/home-screen';
+import CreateQuizScreen from './components/screens/create-quiz-screen';
+import QuizListScreen from './components/screens/quiz-list-screen';
 import { useAppStore } from './store/app-store';
 import GameScreen from './components/screens/game-screen';
 
@@ -26,13 +26,13 @@ export default function App() {
     if (quizId) {
       setHostingQuizId(quizId);
     }
-    setCurrentScreen('in-game');
     setGamePhase('creating');
+    setCurrentScreen('in-game');
   };
 
   return (
     <div
-      className={`min-h-screen transition-all ${currentScreen === 'home' ? 'bg-linear-[27deg] from-purple-600 via-pink-500 to-orange-400' : 'bg-linear-[43deg] from-blue-600 via-teal-500 to-green-400'}`}
+      className={`min-h-screen ${currentScreen === 'home' ? 'bg-linear-[27deg] from-purple-600 via-pink-500 to-orange-400' : 'bg-linear-[43deg] from-blue-600 via-teal-500 to-green-400'}`}
     >
       {currentScreen === 'home' && (
         <HomeScreen onJoinGame={handleJoinGameSubmit} onHostGame={handleHostGameSubmit} />

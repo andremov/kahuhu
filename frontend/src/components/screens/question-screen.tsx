@@ -1,23 +1,11 @@
-import React from 'react';
 import { Timer } from '../ui/timer';
 import { ProgressBar } from '../ui/progress-bar';
-import { GameState } from '../../utils/types';
 
 interface QuestionScreenProps {
-  gameState: GameState;
-  playerId?: string | null;
   onSubmitAnswer: (answerIndex: number) => void;
-  isHost: boolean;
-  hasAnswered?: boolean;
 }
 
-export const QuestionScreen: React.FC<QuestionScreenProps> = ({
-  gameState,
-  playerId,
-  onSubmitAnswer,
-  isHost,
-  hasAnswered = false,
-}) => {
+export default function QuestionScreen({ onSubmitAnswer }: QuestionScreenProps) {
   const currentQuestion = gameState.quiz.questions[gameState.currentQuestionIndex];
 
   const answeredCount = gameState.players.length; // This would need to be tracked properly in real implementation
@@ -146,4 +134,4 @@ export const QuestionScreen: React.FC<QuestionScreenProps> = ({
       </div>
     </div>
   );
-};
+}

@@ -1,25 +1,20 @@
 import { useEffect } from 'react';
 import { useSocket } from '../../hooks/use-socket';
 import { useAppStore } from '../../store/app-store';
-import { GameLobbyScreen } from './game-lobby-screen';
+import GameLobbyScreen from './game-lobby-screen';
 import CreateGameScreen from './create-game-screen';
+import ConnectingScreen from './connecting-screen';
 
 export default function GameScreen() {
-  const { gamePhase, setCurrentScreen, isHost, setGameState } = useAppStore();
+  const { gamePhase, setCurrentScreen, setGameState, setPlayerId, setIsHost } = useAppStore();
   const { socket, isConnected, createGame, joinGame, startGame, submitAnswer, nextQuestion } =
     useSocket();
-
-  // Handle connection state
-  // useEffect(() => {
-  //   if (isConnected && appState === 'connecting') {
-  //     setAppState('home');
-  //   }
-  // }, [isConnected, appState]);
 
   useEffect(() => {
     if (!gamePhase) {
       setCurrentScreen('home');
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [gamePhase]);
 
   useEffect(() => {
@@ -29,29 +24,25 @@ export default function GameScreen() {
     socket.on('game-created', ({ gameCode, gameState: newGameState }) => {
       console.log('Game created:', gameCode);
       setGameState(newGameState);
+      setIsHost(true);
     });
 
     // Game joining events
-    // socket.on('game-joined', ({ playerId: newPlayerId, gameState: newGameState }) => {
-    //   console.log('Game joined:', newPlayerId);
-    //   setPlayerId(newPlayerId);
-    //   setGameState(newGameState);
-    //   setIsHost(false);
-    //   setError(null);
-    // });
-
-    // socket.on('join-error', ({ message }) => {
-    //   setError(message);
-    // });
+    socket.on('game-joined', ({ playerId: newPlayerId, gameState: newGameState }) => {
+      console.log('Game joined:', newPlayerId);
+      setPlayerId(newPlayerId);
+      setGameState(newGameState);
+      setIsHost(false);
+    });
 
     // Player management events
-    // socket.on('player-joined', (newGameState) => {
-    //   setGameState(newGameState);
-    // });
+    socket.on('player-joined', (newGameState) => {
+      setGameState(newGameState);
+    });
 
-    // socket.on('player-left', (newGameState) => {
-    //   setGameState(newGameState);
-    // });
+    socket.on('player-left', (newGameState) => {
+      setGameState(newGameState);
+    });
 
     // Game flow events
     // socket.on('game-started', (newGameState) => {
@@ -107,6 +98,7 @@ export default function GameScreen() {
       socket.off('host-disconnected');
       socket.off('error');
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [socket]);
 
   if (gamePhase === null) {
@@ -115,7 +107,7 @@ export default function GameScreen() {
 
   switch (gamePhase) {
     case 'creating':
-      return <CreateGameScreen onCreateGame={createGame} />;
+      return <CreateGameScreen isConnected={isConnected} onCreateGame={createGame} />;
     case 'lobby':
       return <GameLobbyScreen onStartGame={startGame} />;
     case 'question':
@@ -125,7 +117,7 @@ export default function GameScreen() {
     case 'final':
       return <div className="container mx-auto p-4">Final Results</div>;
     case 'connecting':
-      return <div className="container mx-auto p-4">Connecting...</div>;
+      return <ConnectingScreen isConnected={isConnected} onJoinGame={joinGame} />;
     default:
       return <div className="container mx-auto p-4">Unknown State</div>;
   }

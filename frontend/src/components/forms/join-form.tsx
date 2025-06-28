@@ -43,6 +43,11 @@ export function JoinForm({ onJoinGame }: JoinFormProps) {
             <input
               type="text"
               id="gameCode"
+              autoFocus
+              autoComplete="off"
+              spellCheck="false"
+              pattern="[A-Z0-9]{6}"
+              required
               value={gameCode}
               onChange={(e) => setGameCode(e.target.value.toUpperCase())}
               placeholder="Enter 6-digit code"
@@ -56,6 +61,10 @@ export function JoinForm({ onJoinGame }: JoinFormProps) {
             <input
               type="text"
               id="playerName"
+              autoComplete="off"
+              spellCheck="false"
+              pattern="[A-Za-z0-9]+"
+              required
               value={playerName}
               onChange={(e) => setPlayerName(e.target.value)}
               placeholder="Enter your name"

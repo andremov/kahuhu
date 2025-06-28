@@ -73,6 +73,7 @@ export function getGameState(game: Game) {
       id: p.id,
       name: p.name,
       score: p.score,
+      joinedAt: p.joinedAt.toString(),
     })),
     currentQuestionIndex: game.currentQuestionIndex,
     gameState: game.gameState,
