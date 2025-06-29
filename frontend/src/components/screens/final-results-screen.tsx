@@ -1,4 +1,4 @@
-import { Trophy, Medal, Award, Home } from 'lucide-react';
+import { Trophy, Medal, Award, Home, Crown } from 'lucide-react';
 import { Button } from '../ui/button';
 import { useAppStore } from '../../store/app-store';
 
@@ -55,7 +55,6 @@ export default function FinalResultsScreen() {
           <div className="max-w-md mx-auto mb-8">
             <div className="bg-gradient-to-r from-yellow-400 to-yellow-500 rounded-3xl p-6 shadow-2xl text-center transform rotate-1">
               <div className="bg-white rounded-2xl p-6 transform -rotate-1">
-                {/* <Trophy className="w-16 h-16 text-yellow-500 mx-auto mb-4" /> */}
                 <h2 className="text-6xl mb-4">🏆 </h2>
                 <h3 className="text-3xl font-bold text-yellow-600 mb-2">{winner.name}</h3>
                 <p className="text-gray-600">
@@ -123,10 +122,16 @@ export default function FinalResultsScreen() {
                 <div className="text-sm text-gray-600">Questions</div>
               </div>
 
-              {!isHost && me !== undefined && (
+              {!isHost && me !== undefined ? (
                 <div className="bg-emerald-50 p-4 rounded-xl">
                   <div className="text-2xl font-bold text-emerald-600">{me.correctAnswers}</div>
                   <div className="text-sm text-gray-600">Correct</div>
+                </div>
+              ) : (
+                <div className="bg-emerald-50 p-4 rounded-xl">
+                  <div className="text-2xl font-bold text-emerald-600 mt-2">
+                    <Crown className="w-10 h-10 mx-auto" />
+                  </div>
                 </div>
               )}
             </div>
