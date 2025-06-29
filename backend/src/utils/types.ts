@@ -42,3 +42,15 @@ export interface Quiz {
   description: string;
   questions: Question[];
 }
+
+export interface QuestionResult {
+  questionIndex: number;
+  optionResults: (QuestionOption & { count: number })[];
+  playerResults: {
+    id: string;
+    name: string;
+    answer: number | null;
+    isCorrect: boolean;
+    score: number;
+  }[];
+}

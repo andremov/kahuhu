@@ -9,7 +9,7 @@ interface TimerProps {
 
 export const Timer: React.FC<TimerProps> = ({ timeRemaining, totalTime, isRunning }) => {
   const percentage = (timeRemaining / totalTime) * 100;
-  
+
   const getTimerColor = () => {
     if (percentage > 50) return 'text-green-600';
     if (percentage > 25) return 'text-orange-600';
@@ -23,22 +23,18 @@ export const Timer: React.FC<TimerProps> = ({ timeRemaining, totalTime, isRunnin
   };
 
   return (
-    <div className="flex items-center space-x-4 bg-white/90 backdrop-blur-sm rounded-2xl px-6 py-4 shadow-lg">
-      <Clock className={`w-6 h-6 ${getTimerColor()} ${isRunning ? 'animate-pulse' : ''}`} />
-      <div className="flex-1">
-        <div className="flex items-center justify-between mb-1">
-          <span className="text-sm font-medium text-gray-600">Time Remaining</span>
-          <span className={`text-2xl font-bold ${getTimerColor()}`}>
-            {timeRemaining}s
-          </span>
-        </div>
-        <div className="w-full bg-gray-200 rounded-full h-3">
-          <div
-            className={`h-3 rounded-full transition-all duration-1000 ${getProgressColor()}`}
-            style={{ width: `${percentage}%` }}
-          />
-        </div>
+    <>
+      <div className="flex-1 flex gap-2 items-center justify-between">
+        <Clock className={`w-6 h-6 ${getTimerColor()} ${isRunning ? 'animate-pulse' : ''}`} />
+        <span className={`text-2xl font-bold ${getTimerColor()}`}>{timeRemaining}s</span>
       </div>
-    </div>
+
+      <div className="w-full bg-gray-200 rounded-full h-3">
+        <div
+          className={`h-3 rounded-full transition-all duration-1000 ${getProgressColor()}`}
+          style={{ width: `${percentage}%` }}
+        />
+      </div>
+    </>
   );
 };

@@ -1,6 +1,6 @@
 import { FormEvent, useState } from 'react';
 import { v4 } from 'uuid';
-import { Button } from '../button';
+import { Button } from '../ui/button';
 import { BadgeHelp } from 'lucide-react';
 import { Quiz } from '../../utils/types';
 import { useAppStore } from '../../store/app-store';

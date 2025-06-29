@@ -42,9 +42,14 @@ export interface Game {
 
 export interface QuestionResult {
   questionIndex: number;
-  correctAnswer: number;
-  correctAnswerText: string;
-  playerResults: PlayerResult[];
+  optionResults: (QuestionOption & { count: number })[];
+  playerResults: {
+    id: string;
+    name: string;
+    answer: number | null;
+    isCorrect: boolean;
+    score: number;
+  }[];
 }
 
 export interface PlayerResult {

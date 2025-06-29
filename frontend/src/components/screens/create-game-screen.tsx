@@ -1,6 +1,6 @@
 import { ArrowLeft, ListChecks, Play } from 'lucide-react';
 import { useAppStore } from '../../store/app-store';
-import { Button } from '../button';
+import { Button } from '../ui/button';
 import { Quiz } from '../../utils/types';
 import { useEffect, useState } from 'react';
 import { LoadingSpinner } from '../ui/loading-spinner';

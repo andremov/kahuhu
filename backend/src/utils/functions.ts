@@ -1,5 +1,5 @@
 import { Server } from 'socket.io';
-import { Game } from './types';
+import { Game, QuestionResult } from './types';
 import { Temporal } from '@js-temporal/polyfill';
 import { getGameState } from '../services/games';
 
@@ -19,20 +19,29 @@ export const handleQuestionEnd = (io: Server, game: Game) => {
   game.gameState = 'results';
 
   const currentQuestion = game.quizData!.questions[game.currentQuestionIndex];
-  const questionResults = {
+  const questionResults: QuestionResult = {
     questionIndex: game.currentQuestionIndex,
-    // correctAnswer: currentQuestion.correctAnswer,
-    // correctAnswerText: currentQuestion.options[currentQuestion.correctAnswer],
-    playerResults: Array.from(game.players.values()).map((player) => ({
-      id: player.id,
-      name: player.name,
-      answer: player.answers[game.currentQuestionIndex],
-      // isCorrect: player.answers[game.currentQuestionIndex] === currentQuestion.correctAnswer,
-      score: player.score,
-    })),
+    optionResults: currentQuestion.options.map((option, index) => {
+      const playersWithAnswer = Array.from(game.players.values()).filter(
+        (player) => player.answers[game.currentQuestionIndex] === index
+      );
+      return { ...option, count: playersWithAnswer.length };
+    }),
+    playerResults: Array.from(game.players.values()).map((player) => {
+      const playerAnswer = player.answers[game.currentQuestionIndex];
+      return {
+        id: player.id,
+        name: player.name,
+        answer: player.answers[game.currentQuestionIndex],
+        isCorrect: playerAnswer === null ? false : currentQuestion.options[playerAnswer].points > 0,
+        score: player.score,
+      };
+    }),
   };
 
   io.to(game.code).emit('question-ended', questionResults);
+
+  return;
 
   // Auto-advance to next question after 5 seconds
   setTimeout(() => {

@@ -8,9 +8,11 @@ export default async function startGameSocketEvent(io: Server, socket: Socket) {
     const game = getGameByHostSocketId(socket.id);
     if (!game) return;
 
+    const currentQuestion = game.quizData.questions[game.currentQuestionIndex];
+
     game.gameState = 'question';
     game.currentQuestionIndex = 0;
-    game.timeRemaining = 60;
+    game.timeRemaining = currentQuestion.timeLimit + 3;
     game.questionStartTime = Temporal.Now.plainDateTimeISO();
 
     const gameState = getGameState(game);

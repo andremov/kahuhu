@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { Game, Quiz } from '../utils/types';
+import { Game, QuestionResult, Quiz } from '../utils/types';
 import { Temporal } from '@js-temporal/polyfill';
 
 type ScreenOptions = 'home' | 'create-quiz' | 'create-game' | 'list-quizzes' | 'in-game';
@@ -35,14 +35,22 @@ interface AppState {
   setPlayerId: (newId: string | null) => void;
   playerName: string | null;
   setPlayerName: (newName: string | null) => void;
+  playerAnswers: number[] | null;
+  setPlayerAnswers: (answers: number[] | null) => void;
+  addPlayerAnswer: (answer: number) => void;
 
   joinedGameCode: string | null;
   setJoinedGameCode: (gameCode: string | null) => void;
 
   gameState: Game | null;
   setGameState: (newGameState: Game | null) => void;
+  setTimeRemaining: (timeRemaining: number) => void;
 
-  // playerList: string[]
+  currentQuestionIndex: number;
+  setCurrentQuestionIndex: (index: number) => void;
+
+  questionResult: QuestionResult | null;
+  setQuestionResult: (result: QuestionResult | null) => void;
 
   // questionResult: QuestionResult | null;
   // finalResults: FinalResults | null;
@@ -109,6 +117,16 @@ export const useAppStore = create<AppState>()(
       setPlayerId: (newId) => set({ playerId: newId }),
       playerName: null,
       setPlayerName: (newName) => set({ playerName: newName }),
+      playerAnswers: null,
+      setPlayerAnswers: (answers) => set({ playerAnswers: answers }),
+      addPlayerAnswer: (answer) => {
+        set((state) => ({
+          playerAnswers: state.playerAnswers ? [...state.playerAnswers, answer] : [answer],
+        }));
+      },
+
+      joinedGameCode: null,
+      setJoinedGameCode: (gameCode) => set({ joinedGameCode: gameCode }),
 
       gameState: null,
       setGameState: (newGameState: Game | null) => {
@@ -126,8 +144,17 @@ export const useAppStore = create<AppState>()(
           },
         });
       },
-      joinedGameCode: null,
-      setJoinedGameCode: (gameCode) => set({ joinedGameCode: gameCode }),
+      setTimeRemaining: (timeRemaining) => {
+        set((state) => ({
+          gameState: state.gameState ? { ...state.gameState, timeRemaining } : null,
+        }));
+      },
+
+      currentQuestionIndex: 0,
+      setCurrentQuestionIndex: (index) => set({ currentQuestionIndex: index }),
+
+      questionResult: null,
+      setQuestionResult: (result) => set({ questionResult: result }),
     }),
     {
       name: 'kahuhu-app-storage',
