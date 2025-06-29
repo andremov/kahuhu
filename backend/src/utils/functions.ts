@@ -40,43 +40,6 @@ export const handleQuestionEnd = (io: Server, game: Game) => {
   };
 
   io.to(game.code).emit('question-ended', questionResults);
-
-  return;
-
-  // Auto-advance to next question after 5 seconds
-  setTimeout(() => {
-    if (game.gameState === 'results') {
-      if (game.currentQuestionIndex + 1 >= game.quizData!.questions.length) {
-        // Game over
-        game.gameState = 'final';
-        const finalResults = getFinalResults(game);
-        io.to(game.code).emit('game-ended', finalResults);
-      } else {
-        // Next question
-        game.currentQuestionIndex++;
-        game.gameState = 'question';
-        game.timeRemaining = 60;
-        game.questionStartTime = Temporal.Now.plainDateTimeISO();
-
-        const gameState = getGameState(game);
-        io.to(game.code).emit('next-question', gameState);
-
-        // Start next question timer
-        const questionTimer = setInterval(() => {
-          game.timeRemaining--;
-
-          if (game.timeRemaining <= 0) {
-            clearInterval(questionTimer);
-            handleQuestionEnd(io, game);
-          } else {
-            io.to(game.code).emit('time-update', {
-              timeRemaining: game.timeRemaining,
-            });
-          }
-        }, 1000);
-      }
-    }
-  }, 5000);
 };
 
 export const getFinalResults = (game: Game) => {
@@ -92,9 +55,10 @@ export const getFinalResults = (game: Game) => {
       name: player.name,
       score: player.score,
       position: index + 1,
-      // correctAnswers: player.answers.filter(
-      //   (answer, qIndex) => answer === game.quizData!.questions[qIndex].correctAnswer
-      // ).length,
+      correctAnswers: player.answers.filter(
+        (answer, qIndex) =>
+          answer !== null && game.quizData.questions[qIndex].options[answer].points > 0
+      ).length,
     })),
   };
 };

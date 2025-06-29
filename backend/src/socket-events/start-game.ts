@@ -18,16 +18,19 @@ export default async function startGameSocketEvent(io: Server, socket: Socket) {
     const gameState = getGameState(game);
     io.to(game.code).emit('game-started', gameState);
 
+    const gameCopy = JSON.parse(JSON.stringify(game)); // Deep copy to avoid mutation
+
     // Start question timer
     const questionTimer = setInterval(() => {
-      game.timeRemaining--;
+      gameCopy.timeRemaining--;
 
-      if (game.timeRemaining <= 0) {
+      if (gameCopy.timeRemaining <= 0) {
         clearInterval(questionTimer);
         handleQuestionEnd(io, game);
       } else {
-        io.to(game.code).emit('time-update', {
-          timeRemaining: game.timeRemaining,
+        io.to(gameCopy.code).emit('time-update', {
+          questionIndex: gameCopy.currentQuestionIndex,
+          timeRemaining: gameCopy.timeRemaining,
         });
       }
     }, 1000);

@@ -1,22 +1,20 @@
-import React from 'react';
-import { Trophy, Medal, Award, RotateCcw, Home } from 'lucide-react';
-import { FinalResults } from '../../utils/types';
+import { Trophy, Medal, Award, Home } from 'lucide-react';
 import { Button } from '../ui/button';
+import { useAppStore } from '../../store/app-store';
 
-interface FinalResultsScreenProps {
-  finalResults: FinalResults;
-  onPlayAgain: () => void;
-  onGoHome: () => void;
-  isHost: boolean;
-}
+export default function FinalResultsScreen() {
+  const { finalResults, setCurrentScreen, playerId, isHost } = useAppStore();
 
-export const FinalResultsScreen: React.FC<FinalResultsScreenProps> = ({
-  finalResults,
-  onPlayAgain,
-  onGoHome,
-  isHost,
-}) => {
+  if (!finalResults || finalResults.players.length === 0) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <p className="text-lg text-gray-600">No results available.</p>
+      </div>
+    );
+  }
+
   const winner = finalResults.players[0];
+  const me = finalResults.players.find((player) => player.id === playerId);
 
   const getPositionIcon = (index: number) => {
     if (index === 0) return <Trophy className="w-8 h-8 text-yellow-500" />;
@@ -32,6 +30,10 @@ export const FinalResultsScreen: React.FC<FinalResultsScreenProps> = ({
     if (index === 2)
       return 'bg-gradient-to-r from-orange-50 to-orange-100 border-orange-300 border-2';
     return 'bg-white border-gray-200 border';
+  };
+
+  const onGoHome = () => {
+    setCurrentScreen('home');
   };
 
   return (
@@ -53,8 +55,8 @@ export const FinalResultsScreen: React.FC<FinalResultsScreenProps> = ({
           <div className="max-w-md mx-auto mb-8">
             <div className="bg-gradient-to-r from-yellow-400 to-yellow-500 rounded-3xl p-6 shadow-2xl text-center transform rotate-1">
               <div className="bg-white rounded-2xl p-6 transform -rotate-1">
-                <Trophy className="w-16 h-16 text-yellow-500 mx-auto mb-4" />
-                <h2 className="text-2xl font-bold text-gray-800 mb-2">🏆 Winner!</h2>
+                {/* <Trophy className="w-16 h-16 text-yellow-500 mx-auto mb-4" /> */}
+                <h2 className="text-6xl mb-4">🏆 </h2>
                 <h3 className="text-3xl font-bold text-yellow-600 mb-2">{winner.name}</h3>
                 <p className="text-gray-600">
                   {winner.score} points • {winner.correctAnswers}/{finalResults.quiz.totalQuestions}{' '}
@@ -71,7 +73,7 @@ export const FinalResultsScreen: React.FC<FinalResultsScreenProps> = ({
             <h2 className="text-2xl font-bold text-gray-800 mb-6 text-center">Final Leaderboard</h2>
 
             <div className="space-y-4">
-              {finalResults.players.map((player, index) => (
+              {finalResults.players.slice(0, 5).map((player, index) => (
                 <div
                   key={player.id}
                   className={`flex items-center space-x-4 p-4 rounded-xl ${getPositionClass(index)}`}
@@ -107,7 +109,7 @@ export const FinalResultsScreen: React.FC<FinalResultsScreenProps> = ({
             <h3 className="text-lg font-semibold text-gray-800 mb-4 text-center">
               Game Statistics
             </h3>
-            <div className="grid grid-cols-2 gap-4 text-center">
+            <div className="grid grid-cols-3 gap-4 text-center">
               <div className="bg-purple-50 p-4 rounded-xl">
                 <div className="text-2xl font-bold text-purple-600">
                   {finalResults.players.length}
@@ -120,27 +122,24 @@ export const FinalResultsScreen: React.FC<FinalResultsScreenProps> = ({
                 </div>
                 <div className="text-sm text-gray-600">Questions</div>
               </div>
+
+              {!isHost && me !== undefined && (
+                <div className="bg-emerald-50 p-4 rounded-xl">
+                  <div className="text-2xl font-bold text-emerald-600">{me.correctAnswers}</div>
+                  <div className="text-sm text-gray-600">Correct</div>
+                </div>
+              )}
             </div>
           </div>
         </div>
 
         {/* Action Buttons */}
         <div className="max-w-md mx-auto space-y-4">
-          {isHost && (
-            <Button onClick={onPlayAgain} icon={RotateCcw} size="lg" className="w-full">
-              Play Again
-            </Button>
-          )}
           <Button onClick={onGoHome} variant="secondary" icon={Home} size="lg" className="w-full">
             Back to Home
           </Button>
         </div>
-
-        {/* Thank You Message */}
-        <div className="text-center mt-12">
-          <p className="text-white/80 text-lg">Thanks for playing! 🎮</p>
-        </div>
       </div>
     </div>
   );
-};
+}

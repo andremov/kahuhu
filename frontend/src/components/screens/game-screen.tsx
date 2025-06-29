@@ -4,8 +4,10 @@ import { useAppStore } from '../../store/app-store';
 import GameLobbyScreen from './game-lobby-screen';
 import CreateGameScreen from './create-game-screen';
 import ConnectingScreen from './connecting-screen';
-import { QuestionResult } from '../../utils/types';
+import type { FinalResults, QuestionResult } from '../../utils/types';
 import QuestionScreen from './question-screen';
+import QuestionResultsScreen from './question-results-screen';
+import FinalResultsScreen from './final-results-screen';
 
 export default function GameScreen() {
   const {
@@ -20,6 +22,7 @@ export default function GameScreen() {
     setQuestionResult,
     setPlayerAnswers,
     addPlayerAnswer,
+    setFinalResults,
   } = useAppStore();
   const { socket, isConnected, createGame, joinGame, startGame, submitAnswer, nextQuestion } =
     useSocket();
@@ -65,40 +68,47 @@ export default function GameScreen() {
       setGameState(newGameState);
       setCurrentQuestionIndex(newGameState.currentQuestionIndex || 0);
       setGamePhase('question');
-      // setQuestionResult(null);
-      // setFinalResults(null);
     });
 
-    socket.on('time-update', ({ timeRemaining }) => {
-      setTimeRemaining(timeRemaining);
+    socket.on('time-update', ({ timeRemaining, questionIndex }) => {
+      setTimeRemaining(timeRemaining, questionIndex);
     });
 
-    socket.on('answer-submitted', ({ answerIndex, isCorrect, score, totalScore }) => {
+    socket.on('answer-submitted', (data) => {
+      const {
+        answerIndex,
+        //  isCorrect, score, totalScore
+      } = data;
       addPlayerAnswer(answerIndex);
     });
 
     socket.on('question-ended', (result: QuestionResult) => {
+      setGamePhase('results');
       setQuestionResult(result);
     });
 
-    // socket.on('next-question', (newGameState) => {
-    //   setGameState(newGameState);
-    //   setQuestionResult(null);
-    // });
+    socket.on('next-question', (newGameState) => {
+      setGameState(newGameState);
+      setGamePhase('question');
+      setCurrentQuestionIndex(newGameState.currentQuestionIndex);
+      setQuestionResult(null);
+    });
 
-    // socket.on('game-ended', (results: FinalResults) => {
-    //   setFinalResults(results);
-    //   setGameState((prev) => (prev ? { ...prev, gameState: 'final' } : null));
-    // });
+    socket.on('game-ended', (results: FinalResults) => {
+      setFinalResults(results);
+      setGamePhase('final');
+    });
 
-    // socket.on('host-disconnected', () => {
-    //   setError('Host disconnected. Game ended.');
-    //   resetGame();
-    // });
-
-    // socket.on('error', ({ message }) => {
-    //   setError(message);
-    // });
+    socket.on('host-disconnected', () => {
+      setCurrentScreen('home');
+      setGamePhase(null);
+      setGameState(null);
+      setPlayerId(null);
+      setIsHost(false);
+      setCurrentQuestionIndex(0);
+      setQuestionResult(null);
+      setPlayerAnswers(null);
+    });
 
     return () => {
       socket.off('game-created');
@@ -130,9 +140,9 @@ export default function GameScreen() {
     case 'question':
       return <QuestionScreen onSubmitAnswer={submitAnswer} />;
     case 'results':
-      return <div className="container mx-auto p-4">Results</div>;
+      return <QuestionResultsScreen onNextQuestion={nextQuestion} />;
     case 'final':
-      return <div className="container mx-auto p-4">Final Results</div>;
+      return <FinalResultsScreen />;
     case 'connecting':
       return <ConnectingScreen isConnected={isConnected} onJoinGame={joinGame} />;
     default:

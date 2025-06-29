@@ -1,7 +1,7 @@
 import { ArrowLeft, Download, ListOrdered, Pencil, Play, PlusCircle, Trash2 } from 'lucide-react';
 import { Button } from '../ui/button';
 import { useAppStore } from '../../store/app-store';
-import { Dropzone } from '../dropzone';
+import { Dropzone } from '../ui/dropzone';
 import { Quiz } from '../../utils/types';
 
 interface QuizListScreenProps {
