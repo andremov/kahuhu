@@ -2,6 +2,7 @@ import { ProgressBar } from '../ui/progress-bar';
 import { useAppStore } from '../../store/app-store';
 import { useEffect } from 'react';
 import { Button } from '../ui/button';
+import { AnswerShape } from '../ui/answer-shape';
 
 interface QuestionScreenProps {
   onNextQuestion: () => void;
@@ -39,11 +40,6 @@ export default function QuestionResultsScreen({ onNextQuestion }: QuestionScreen
       'from-green-500 to-green-600',
     ];
     return colors[index] || colors[0];
-  };
-
-  const getAnswerShapes = (index: number) => {
-    const shapes = ['▲', '♦', '●', '■'];
-    return shapes[index] || shapes[0];
   };
 
   if (gameState.timeRemaining > gameState.quizData.questions[currentQuestionIndex].timeLimit) {
@@ -141,7 +137,7 @@ export default function QuestionResultsScreen({ onNextQuestion }: QuestionScreen
                   className={`p-6 rounded-2xl text-white font-bold text-lg flex flex-col shadow-lg bg-gradient-to-r items-center gap-4 ${getAnswerColors(index)}`}
                 >
                   <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center text-2xl">
-                    {getAnswerShapes(index)}
+                    <AnswerShape index={index} />
                   </div>
                   <span className="flex-1 text-left text-sm">{option.text}</span>
                 </div>
@@ -167,8 +163,6 @@ export default function QuestionResultsScreen({ onNextQuestion }: QuestionScreen
               />
             </div>
           </div>
-
-          <div className="w-full md:w-1/4 md:h-full bg-white/95 backdrop-blur-sm rounded-md md:rounded-3xl p-3 md:p-6 shadow-2xl text-center flex flex-col justify-between gap-2"></div>
         </div>
 
         <div className="flex flex-col items-center justify-center flex-1">
@@ -181,9 +175,9 @@ export default function QuestionResultsScreen({ onNextQuestion }: QuestionScreen
             <div className="text-lg">You have {myResults.score} points.</div>{' '}
             {myResults.answer !== undefined && myResults.answer !== null ? (
               <div
-                className={`p-2 bg-gradient-to-r rounded-xl text-3xl text-white ${getAnswerColors(myResults.answer)}`}
+                className={`p-2 bg-gradient-to-r rounded-xl text-3xl flex justify-center text-white ${getAnswerColors(myResults.answer)}`}
               >
-                {getAnswerShapes(myResults.answer)}
+                <AnswerShape index={myResults.answer} />
               </div>
             ) : (
               <div className="text-gray-500">No answer.</div>

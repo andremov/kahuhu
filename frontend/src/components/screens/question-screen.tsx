@@ -2,6 +2,7 @@ import { Timer } from '../ui/timer';
 import { ProgressBar } from '../ui/progress-bar';
 import { useAppStore } from '../../store/app-store';
 import { useEffect } from 'react';
+import { AnswerShape } from '../ui/answer-shape';
 
 interface QuestionScreenProps {
   onSubmitAnswer: (answerIndex: number) => void;
@@ -42,11 +43,6 @@ export default function QuestionScreen({ onSubmitAnswer }: QuestionScreenProps) 
       'hover:from-green-600 hover:to-green-700',
     ];
     return hoverColors[index] || hoverColors[0];
-  };
-
-  const getAnswerShapes = (index: number) => {
-    const shapes = ['▲', '♦', '●', '■'];
-    return shapes[index] || shapes[0];
   };
 
   const hasAnswered = isHost
@@ -132,7 +128,7 @@ export default function QuestionScreen({ onSubmitAnswer }: QuestionScreenProps) 
                   `}
             >
               <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center text-2xl">
-                {getAnswerShapes(index)}
+                <AnswerShape index={index} />
               </div>
               <span className="flex-1 text-left">{option.text}</span>
             </div>
@@ -142,7 +138,7 @@ export default function QuestionScreen({ onSubmitAnswer }: QuestionScreenProps) 
               onClick={() => !hasAnswered && onSubmitAnswer(index)}
               disabled={hasAnswered || gameState.timeRemaining <= 0}
               className={`
-                    p-1 md:p-6 rounded-md md:rounded-2xl text-white font-bold text-8xl transition-all duration-200 transform disabled:cursor-not-allowed
+                    p-1 md:p-6 rounded-md md:rounded-2xl text-white font-bold text-8xl transition-all duration-200 transform disabled:cursor-not-allowed flex items-center justify-center
                     ${
                       hasAnswered || gameState.timeRemaining <= 0
                         ? currentAnswerIndex === index
@@ -153,7 +149,7 @@ export default function QuestionScreen({ onSubmitAnswer }: QuestionScreenProps) 
                     bg-gradient-to-r ${getAnswerColors(index)} ${getAnswerHoverColors(index)}
                   `}
             >
-              {getAnswerShapes(index)}
+              <AnswerShape index={index} filled className="w-24 h-24" />
             </button>
           )
         )}
