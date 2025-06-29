@@ -17,6 +17,6 @@ export function AnswerShape({ index, filled = true, className = '' }: AnswerShap
     case 3:
       return <Square className={`${className} ${filled ? 'fill-white' : ''}`} />;
     default:
-      return <Ban className={`${className} ${filled ? 'fill-white' : ''}`} />;
+      return <Ban />;
   }
 }
