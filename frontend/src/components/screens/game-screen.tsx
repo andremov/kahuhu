@@ -77,7 +77,7 @@ export default function GameScreen() {
     socket.on('answer-submitted', (data) => {
       const {
         answerIndex,
-        //  isCorrect, score, totalScore
+        //  score, totalScore
       } = data;
       addPlayerAnswer(answerIndex);
     });
