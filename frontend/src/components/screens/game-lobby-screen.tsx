@@ -65,7 +65,7 @@ export default function GameLobbyScreen({ onStartGame }: GameLobbyScreenProps) {
       <div className="max-w-md mx-auto mb-8">
         <div className="bg-white/95 backdrop-blur-sm rounded-3xl p-6 shadow-2xl text-center">
           <h3 className="text-lg font-semibold text-gray-800 mb-3">Game Code</h3>
-          <div className="flex items-center justify-center space-x-2 mb-4">
+          <div className="flex items-center justify-center space-x-2 mb-4 flex-col md:flex-row gap-2">
             <div className="text-4xl font-bold tracking-widest text-purple-600 bg-purple-50 px-6 py-3 rounded-xl">
               {gameState.code}
             </div>
@@ -86,7 +86,7 @@ export default function GameLobbyScreen({ onStartGame }: GameLobbyScreenProps) {
       {/* Players List */}
       <div className="max-w-2xl mx-auto mb-8">
         <div className="bg-white/95 backdrop-blur-sm rounded-3xl p-6 shadow-2xl">
-          <div className="flex items-center justify-between mb-6">
+          <div className="flex flex-col md:flex-row items-center justify-between mb-6">
             <h3 className="text-xl font-bold text-gray-800">
               Players ({gameState.players.length})
             </h3>
@@ -126,7 +126,7 @@ export default function GameLobbyScreen({ onStartGame }: GameLobbyScreenProps) {
       </div>
 
       {/* Quiz Info */}
-      {!isHost && (
+      {isHost && (
         <div className="max-w-md mx-auto mb-8">
           <div className="bg-white/95 backdrop-blur-sm rounded-3xl p-6 shadow-2xl text-center">
             <h3 className="text-lg font-semibold text-gray-800 mb-4">Quiz Details</h3>
