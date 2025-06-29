@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { Game, QuestionResult, Quiz } from '../utils/types';
+import { FinalResults, Game, QuestionResult, Quiz } from '../utils/types';
 import { Temporal } from '@js-temporal/polyfill';
 
 type ScreenOptions = 'home' | 'create-quiz' | 'create-game' | 'list-quizzes' | 'in-game';
@@ -44,7 +44,7 @@ interface AppState {
 
   gameState: Game | null;
   setGameState: (newGameState: Game | null) => void;
-  setTimeRemaining: (timeRemaining: number) => void;
+  setTimeRemaining: (timeRemaining: number, questionIndex: number) => void;
 
   currentQuestionIndex: number;
   setCurrentQuestionIndex: (index: number) => void;
@@ -52,15 +52,8 @@ interface AppState {
   questionResult: QuestionResult | null;
   setQuestionResult: (result: QuestionResult | null) => void;
 
-  // questionResult: QuestionResult | null;
-  // finalResults: FinalResults | null;
-
-  // createGame: (quiz: any) => void;
-  // joinGame: (gameCode: string, playerName: string) => void;
-  // startGame: () => void;
-  // submitAnswer: (answerIndex: number) => void;
-  // nextQuestion: () => void;
-  // resetGame: () => void;
+  finalResults: FinalResults | null;
+  setFinalResults: (results: FinalResults | null) => void;
 }
 
 export const useAppStore = create<AppState>()(
@@ -144,17 +137,40 @@ export const useAppStore = create<AppState>()(
           },
         });
       },
-      setTimeRemaining: (timeRemaining) => {
-        set((state) => ({
-          gameState: state.gameState ? { ...state.gameState, timeRemaining } : null,
-        }));
+      setTimeRemaining: (timeRemaining, questionIndex) => {
+        set((state) => {
+          if (state.currentQuestionIndex === questionIndex) {
+            return {
+              ...state,
+              gameState: state.gameState ? { ...state.gameState, timeRemaining } : null,
+            };
+          } else {
+            return state;
+          }
+        });
       },
 
       currentQuestionIndex: 0,
       setCurrentQuestionIndex: (index) => set({ currentQuestionIndex: index }),
 
       questionResult: null,
-      setQuestionResult: (result) => set({ questionResult: result }),
+      setQuestionResult: (result) => {
+        if (result === null) {
+          set({ questionResult: null });
+          return;
+        }
+
+        set((state) => {
+          if (state.currentQuestionIndex === result.questionIndex) {
+            return { questionResult: result };
+          } else {
+            return state;
+          }
+        });
+      },
+
+      finalResults: null,
+      setFinalResults: (results) => set({ finalResults: results }),
     }),
     {
       name: 'kahuhu-app-storage',

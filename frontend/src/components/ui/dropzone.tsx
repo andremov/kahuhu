@@ -1,7 +1,7 @@
 import { Upload } from 'lucide-react';
-import { Button } from './ui/button';
+import { Button } from './button';
 import { useState } from 'react';
-import { Quiz } from '../utils/types';
+import { Quiz } from '../../utils/types';
 import { v4 } from 'uuid';
 
 interface DropzoneProps {
