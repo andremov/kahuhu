@@ -22,11 +22,19 @@ export default async function startGameSocketEvent(io: Server, socket: Socket) {
 
     // Start question timer
     const questionTimer = setInterval(() => {
+      if (
+        gameCopy.currentQuestionIndex !== game.currentQuestionIndex ||
+        game.gameState !== 'question'
+      ) {
+        clearInterval(questionTimer);
+        return; // Stop the timer if the question index has changed
+      }
+
       gameCopy.timeRemaining--;
 
       if (gameCopy.timeRemaining <= 0) {
         clearInterval(questionTimer);
-        handleQuestionEnd(io, game);
+        handleQuestionEnd(io, gameCopy);
       } else {
         io.to(gameCopy.code).emit('time-update', {
           questionIndex: gameCopy.currentQuestionIndex,

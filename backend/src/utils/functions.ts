@@ -3,15 +3,8 @@ import { Game, QuestionResult } from './types';
 import { Temporal } from '@js-temporal/polyfill';
 import { getGameState } from '../services/games';
 
-export const calculateScore = (
-  isCorrect: boolean,
-  timeRemaining: number,
-  totalTime: number,
-  basePoints: number
-) => {
-  if (!isCorrect) return 0;
-
-  const timeBonus = Math.max(0, timeRemaining / totalTime);
+export const calculateScore = (timeRemaining: number, totalTime: number, basePoints: number) => {
+  const timeBonus = Math.min(1, timeRemaining / totalTime);
   return Math.round(basePoints * (0.5 + 0.5 * timeBonus));
 };
 

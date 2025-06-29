@@ -22,9 +22,7 @@ export default function submitAnswerSocketEvent(
     // Calculate score
     const currentQuestion = game.quizData.questions[game.currentQuestionIndex];
     const answerPoints = currentQuestion.options[Number(answerIndex)].points;
-    const isCorrect = answerPoints > 0;
     const questionScore = calculateScore(
-      isCorrect,
       game.timeRemaining,
       currentQuestion.timeLimit,
       answerPoints
@@ -35,7 +33,6 @@ export default function submitAnswerSocketEvent(
     // Notify player of their answer submission
     socket.emit('answer-submitted', {
       answerIndex,
-      isCorrect,
       score: questionScore,
       totalScore: player.score,
     });
