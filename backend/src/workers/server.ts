@@ -3,8 +3,6 @@ import { createServer } from 'http';
 import { Server } from 'socket.io';
 import cors from 'cors';
 import onSocketConnection from '../socket-events/on-socket-connection';
-import { connectDB } from './db';
-import endpointRouter from '../rest-endpoints/endpoint-routes';
 import { Temporal } from '@js-temporal/polyfill';
 
 export default function createKahuhuServer() {
@@ -34,11 +32,7 @@ export default function createKahuhuServer() {
     });
   });
 
-  // app.use('/api', endpointRouter);
-
   io.on('connection', (socket) => onSocketConnection(io, socket));
-
-  // connectDB();
 
   return server;
 }
