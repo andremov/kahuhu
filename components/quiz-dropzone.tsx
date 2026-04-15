@@ -1,9 +1,10 @@
 "use client";
 
 import { useState, useRef, DragEvent, ChangeEvent } from "react";
+import { motion } from "framer-motion";
+import { Check, FileJson, Upload } from "lucide-react";
 import { safeParseQuiz } from "@/lib/quiz-schema";
 import type { Quiz } from "@/lib/types";
-import { Upload, FileJson, Check } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface Props {
@@ -55,9 +56,9 @@ export default function QuizDropzone({ onQuiz, quiz }: Props) {
         onDragLeave={() => setDragOver(false)}
         onDrop={onDrop}
         className={cn(
-          "flex cursor-pointer flex-col items-center justify-center gap-3 rounded-xl border-2 border-dashed border-border bg-card/40 p-10 text-center transition-colors hover:bg-card/80",
-          dragOver && "border-primary bg-primary/5",
-          quiz && "border-emerald-500/50 bg-emerald-500/5",
+          "group relative flex min-h-[280px] cursor-pointer flex-col items-center justify-center gap-4 overflow-hidden rounded-3xl border-2 border-dashed border-white/20 bg-card/40 p-10 text-center backdrop-blur-xl transition-all hover:border-primary/60 hover:bg-card/60",
+          dragOver && "scale-[1.02] border-primary bg-primary/10",
+          quiz && "border-answer-2/60 bg-answer-2/5",
         )}
       >
         <input
@@ -67,35 +68,54 @@ export default function QuizDropzone({ onQuiz, quiz }: Props) {
           className="hidden"
           onChange={onChange}
         />
+        <div
+          className="pointer-events-none absolute inset-0 -z-10 opacity-0 transition-opacity group-hover:opacity-100"
+          style={{
+            background:
+              "radial-gradient(circle at center, oklch(0.82 0.17 200 / 0.15) 0%, transparent 65%)",
+          }}
+        />
         {quiz ? (
-          <>
-            <Check className="size-8 text-emerald-400" />
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="flex flex-col items-center gap-3"
+          >
+            <div className="flex size-16 items-center justify-center rounded-2xl bg-answer-2/20 text-answer-2">
+              <Check className="size-8" strokeWidth={3} />
+            </div>
             <div className="flex flex-col items-center gap-1">
-              <p className="font-semibold">{quiz.title}</p>
+              <p className="font-display text-2xl font-bold">{quiz.title}</p>
               <p className="text-sm text-muted-foreground">
                 {quiz.questions.length} question
                 {quiz.questions.length === 1 ? "" : "s"}
                 {quiz.description ? ` · ${quiz.description}` : ""}
               </p>
-              <p className="mt-1 text-xs text-muted-foreground">
+              <p className="mt-2 font-display text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
                 Click to replace
               </p>
             </div>
-          </>
+          </motion.div>
         ) : (
           <>
-            <Upload className="size-8 text-muted-foreground" />
-            <div className="flex flex-col gap-1">
-              <p className="font-semibold">Drop a quiz JSON here</p>
+            <div className="flex size-16 items-center justify-center rounded-2xl bg-white/5 text-primary">
+              <Upload className="size-8" strokeWidth={2.5} />
+            </div>
+            <div className="flex flex-col items-center gap-1">
+              <p className="font-display text-2xl font-bold">
+                Drop a quiz JSON here
+              </p>
               <p className="text-sm text-muted-foreground">
                 Or click to browse. Create one from the{" "}
-                <FileJson className="inline size-3" /> Create Quiz page.
+                <FileJson className="inline size-3" /> Create page.
               </p>
             </div>
           </>
         )}
       </div>
-      {error ? <p className="text-sm text-destructive">{error}</p> : null}
+      {error ? (
+        <p className="text-sm text-destructive">{error}</p>
+      ) : null}
     </div>
   );
 }

@@ -2,6 +2,8 @@
 
 import { use, useEffect, useMemo } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
+import { AnimatePresence, motion } from "framer-motion";
+import { Loader2 } from "lucide-react";
 import { usePartyRoom } from "@/lib/party";
 import { useHostStaging } from "@/lib/store";
 import type { PlayerRole } from "@/lib/types";
@@ -58,7 +60,7 @@ export default function RoomPage({
     return (
       <main className="flex flex-1 items-center justify-center p-8 text-center">
         <div className="flex flex-col gap-2">
-          <p className="text-lg font-semibold">Missing name</p>
+          <p className="font-display text-lg font-bold">Missing name</p>
           <p className="text-sm text-muted-foreground">
             Go back and enter a name first.
           </p>
@@ -75,7 +77,7 @@ export default function RoomPage({
     return (
       <main className="flex flex-1 items-center justify-center p-8 text-center">
         <div className="flex flex-col gap-2">
-          <p className="text-lg font-semibold text-destructive">
+          <p className="font-display text-lg font-bold text-destructive">
             {room.errorMessage}
           </p>
           <p className="text-sm text-muted-foreground">
@@ -89,7 +91,12 @@ export default function RoomPage({
   if (!room.connected || !room.state) {
     return (
       <main className="flex flex-1 items-center justify-center p-8 text-center">
-        <p className="text-sm text-muted-foreground">Connecting to room…</p>
+        <div className="flex flex-col items-center gap-3 text-muted-foreground">
+          <Loader2 className="size-8 animate-spin text-primary" />
+          <p className="font-display text-xs font-semibold uppercase tracking-widest">
+            Connecting to room…
+          </p>
+        </div>
       </main>
     );
   }
@@ -120,55 +127,95 @@ export default function RoomPage({
     room.submitAnswer(index);
   };
 
-  switch (state.gameState) {
-    case "lobby":
-      return (
-        <main className="flex flex-1 flex-col">
-          <Lobby state={state} isHost={isHostClient} onStart={room.start} />
-        </main>
-      );
-    case "question":
-      return (
-        <main className="flex flex-1 flex-col">
-          <QuestionScreen
-            state={state}
-            role={room.role}
-            myAnswer={localMyAnswer ?? myAnswer}
-            onAnswer={handleAnswer}
-          />
-        </main>
-      );
-    case "results":
-      return (
-        <main className="flex flex-1 flex-col">
-          {room.lastResult ? (
-            <QuestionResultsScreen
+  const transition = { duration: 0.35, ease: "easeInOut" as const };
+  const variants = {
+    initial: { opacity: 0, y: 16 },
+    animate: { opacity: 1, y: 0 },
+    exit: { opacity: 0, y: -16 },
+  };
+
+  return (
+    <main className="flex flex-1 flex-col">
+      <AnimatePresence mode="wait">
+        {state.gameState === "lobby" && (
+          <motion.div
+            key="lobby"
+            initial="initial"
+            animate="animate"
+            exit="exit"
+            variants={variants}
+            transition={transition}
+            className="flex flex-1 flex-col"
+          >
+            <Lobby state={state} isHost={isHostClient} onStart={room.start} />
+          </motion.div>
+        )}
+        {state.gameState === "question" && (
+          <motion.div
+            key={`question-${state.currentQuestionIndex}`}
+            initial="initial"
+            animate="animate"
+            exit="exit"
+            variants={variants}
+            transition={transition}
+            className="flex flex-1 flex-col"
+          >
+            <QuestionScreen
               state={state}
-              result={room.lastResult}
-              isHost={isHostClient}
-              onNext={room.next}
+              role={room.role}
+              myAnswer={localMyAnswer ?? myAnswer}
+              onAnswer={handleAnswer}
             />
-          ) : (
-            <p className="p-8 text-center text-muted-foreground">
-              Tallying results…
-            </p>
-          )}
-        </main>
-      );
-    case "final":
-      return (
-        <main className="flex flex-1 flex-col">
-          {room.finalResults ? (
-            <FinalScreen
-              results={room.finalResults}
-              myPlayerId={room.playerId}
-            />
-          ) : (
-            <p className="p-8 text-center text-muted-foreground">
-              Loading final scores…
-            </p>
-          )}
-        </main>
-      );
-  }
+          </motion.div>
+        )}
+        {state.gameState === "results" && (
+          <motion.div
+            key={`results-${state.currentQuestionIndex}`}
+            initial="initial"
+            animate="animate"
+            exit="exit"
+            variants={variants}
+            transition={transition}
+            className="flex flex-1 flex-col"
+          >
+            {room.lastResult ? (
+              <QuestionResultsScreen
+                state={state}
+                result={room.lastResult}
+                isHost={isHostClient}
+                onNext={room.next}
+                myPlayerId={room.playerId}
+              />
+            ) : (
+              <p className="p-8 text-center text-muted-foreground">
+                Tallying results…
+              </p>
+            )}
+          </motion.div>
+        )}
+        {state.gameState === "final" && (
+          <motion.div
+            key="final"
+            initial="initial"
+            animate="animate"
+            exit="exit"
+            variants={variants}
+            transition={transition}
+            className="flex flex-1 flex-col"
+          >
+            {room.finalResults ? (
+              <FinalScreen
+                results={room.finalResults}
+                myPlayerId={room.playerId}
+              />
+            ) : (
+              <p className="p-8 text-center text-muted-foreground">
+                Loading final scores…
+              </p>
+            )}
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </main>
+  );
 }

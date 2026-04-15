@@ -9,14 +9,12 @@ interface Orb {
   vy: number;
 }
 
-const COLORS = [
-  "from-pink-400",
-  "from-teal-300",
-  "from-red-500",
-  "from-green-400",
-  "from-blue-600",
-  "from-violet-500",
-  "from-yellow-400",
+const ORB_COLORS = [
+  "var(--answer-1)",
+  "var(--answer-2)",
+  "var(--answer-3)",
+  "var(--answer-4)",
+  "var(--accent)",
 ];
 
 export default function Background() {
@@ -28,16 +26,16 @@ export default function Background() {
     const height = window.innerHeight;
 
     setOrbs(
-      Array.from({ length: COLORS.length }, () => ({
+      Array.from({ length: ORB_COLORS.length }, () => ({
         x: Math.random() * width,
         y: Math.random() * height,
-        vx: (Math.random() - 0.5) * 5,
-        vy: (Math.random() - 0.5) * 5,
+        vx: (Math.random() - 0.5) * 2.2,
+        vy: (Math.random() - 0.5) * 2.2,
       })),
     );
 
-    const orbSize = 256;
-    const overflow = 0.2;
+    const orbSize = 420;
+    const overflow = 0.25;
     const lowerBoundX = orbSize * overflow * -1;
     const upperBoundX = width - orbSize * (1 - overflow);
     const lowerBoundY = orbSize * overflow * -1;
@@ -73,18 +71,28 @@ export default function Background() {
   }, []);
 
   return (
-    <div className="pointer-events-none fixed inset-0 -z-10 overflow-hidden blur-3xl">
-      {orbs.map((orb, index) => (
-        <div
-          key={index}
-          style={{
-            top: orb.y,
-            left: orb.x,
-            transform: "translate3d(0, 0, 0)",
-          }}
-          className={`absolute size-64 rounded-full bg-radial ${COLORS[index]} from-70% to-70% to-transparent opacity-80`}
-        />
-      ))}
-    </div>
+    <>
+      <div className="pointer-events-none fixed inset-0 -z-20 overflow-hidden blur-3xl">
+        {orbs.map((orb, index) => (
+          <div
+            key={index}
+            style={{
+              top: orb.y,
+              left: orb.x,
+              background: `radial-gradient(circle at center, ${ORB_COLORS[index]} 0%, ${ORB_COLORS[index]} 35%, transparent 70%)`,
+              opacity: 0.45,
+            }}
+            className="absolute size-[420px] rounded-full"
+          />
+        ))}
+      </div>
+      <div
+        className="pointer-events-none fixed inset-0 -z-10"
+        style={{
+          background:
+            "radial-gradient(ellipse at center, transparent 20%, var(--background) 95%)",
+        }}
+      />
+    </>
   );
 }
