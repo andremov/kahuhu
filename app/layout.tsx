@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono, Space_Grotesk } from "next/font/google";
 import "./globals.css";
 import Background from "@/components/background";
+import { Footer } from "@/components/footer";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -21,7 +22,7 @@ const spaceGrotesk = Space_Grotesk({
 
 export const metadata: Metadata = {
   title: "Kahuhu",
-  description: "A realtime quiz game powered by PartyKit.",
+  description: "A realtime quiz game powered by PartyKit. By Andrés Movilla",
 };
 
 export default function RootLayout({
@@ -37,6 +38,7 @@ export default function RootLayout({
       <body className="relative flex min-h-full flex-col overflow-x-hidden">
         <Background />
         {children}
+        <Footer />
       </body>
     </html>
   );

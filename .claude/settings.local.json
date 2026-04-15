@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Read(//d/_web-games/actor-link/**)",
+      "Read(//d/_web-games/actor-link/app/**)",
+      "Read(//d/_web-games/actor-link/src/**)"
+    ]
+  }
+}
