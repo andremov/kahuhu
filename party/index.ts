@@ -24,15 +24,22 @@ function makeId(): string {
   return Math.random().toString(36).slice(2, 12);
 }
 
+interface ServerPlayer extends Player {
+  currentQuestionDelta: number;
+}
+
+const ACCELERATED_REMAINING_MS = 5000;
+
 export default class GameServer implements Party.Server {
   quiz: Quiz | null = null;
-  players: Map<string, Player> = new Map();
+  players: Map<string, ServerPlayer> = new Map();
   hostConnId: string | null = null;
   currentQuestionIndex = 0;
   gameState: GameState = "lobby";
   questionStartedAt = 0;
   questionEndsAt = 0;
   timerHandle: ReturnType<typeof setTimeout> | null = null;
+  acceleratedThisQuestion = false;
 
   constructor(readonly room: Party.Room) {}
 
@@ -124,12 +131,13 @@ export default class GameServer implements Party.Server {
     this.currentQuestionIndex = 0;
     this.gameState = "lobby";
 
-    const player: Player = {
+    const player: ServerPlayer = {
       id: makeId(),
       name: name || "Host",
       role,
       score: 0,
       answers: new Array(quiz.questions.length).fill(null),
+      currentQuestionDelta: 0,
     };
     this.players.set(conn.id, player);
 
@@ -160,12 +168,13 @@ export default class GameServer implements Party.Server {
     const effectiveRole: PlayerRole =
       role === "host-tv" || role === "host-player" ? "player" : "player";
 
-    const player: Player = {
+    const player: ServerPlayer = {
       id: makeId(),
       name: name || "Player",
       role: effectiveRole,
       score: 0,
       answers: new Array(this.quiz.questions.length).fill(null),
+      currentQuestionDelta: 0,
     };
     this.players.set(conn.id, player);
 
@@ -189,32 +198,34 @@ export default class GameServer implements Party.Server {
     const player = this.players.get(conn.id);
     if (!player) return;
     if (player.role === "host-tv") return;
-    if (player.answers[this.currentQuestionIndex] !== null) return;
 
     const question = this.quiz.questions[this.currentQuestionIndex];
     if (answerIndex < 0 || answerIndex >= question.options.length) return;
 
-    player.answers[this.currentQuestionIndex] = answerIndex;
     const basePoints = question.options[answerIndex].points;
     const timeRemaining = Math.max(
       0,
       Math.ceil((this.questionEndsAt - Date.now()) / 1000),
     );
-    player.score += calculateScore(
+    const newDelta = calculateScore(
       timeRemaining,
       question.timeLimit,
       basePoints,
     );
+
+    player.score -= player.currentQuestionDelta;
+    player.score += newDelta;
+    player.currentQuestionDelta = newDelta;
+    player.answers[this.currentQuestionIndex] = answerIndex;
 
     const everyoneAnswered = Array.from(this.players.values())
       .filter((p) => p.role !== "host-tv")
       .every((p) => p.answers[this.currentQuestionIndex] !== null);
 
     if (everyoneAnswered) {
-      this.endQuestion();
-    } else {
-      this.broadcastState();
+      this.maybeAccelerateTimer();
     }
+    this.broadcastState();
   }
 
   private handleNext(conn: Party.Connection) {
@@ -236,7 +247,22 @@ export default class GameServer implements Party.Server {
     this.gameState = "question";
     this.questionStartedAt = Date.now();
     this.questionEndsAt = this.questionStartedAt + question.timeLimit * 1000;
+    this.acceleratedThisQuestion = false;
+    for (const p of this.players.values()) {
+      p.currentQuestionDelta = 0;
+    }
     this.broadcastState();
+    this.scheduleQuestionEnd(question);
+  }
+
+  private maybeAccelerateTimer() {
+    if (this.acceleratedThisQuestion) return;
+    if (!this.quiz) return;
+    const target = Date.now() + ACCELERATED_REMAINING_MS;
+    if (target >= this.questionEndsAt) return;
+    this.acceleratedThisQuestion = true;
+    this.questionEndsAt = target;
+    const question = this.quiz.questions[this.currentQuestionIndex];
     this.scheduleQuestionEnd(question);
   }
 

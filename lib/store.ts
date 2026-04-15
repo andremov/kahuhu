@@ -2,7 +2,16 @@ import { create } from "zustand";
 import type { Question, Quiz, QuestionOption } from "./types";
 import { makeId } from "./score";
 
-type EditorQuestion = Omit<Question, "id"> & { id: string };
+interface EditorOption extends QuestionOption {
+  enabled: boolean;
+}
+
+interface EditorQuestion {
+  id: string;
+  statement: string;
+  timeLimit: number;
+  options: EditorOption[];
+}
 
 interface EditorState {
   title: string;
@@ -13,8 +22,7 @@ interface EditorState {
   addQuestion: () => void;
   removeQuestion: (id: string) => void;
   updateQuestion: (id: string, patch: Partial<EditorQuestion>) => void;
-  addOption: (questionId: string) => void;
-  removeOption: (questionId: string, index: number) => void;
+  toggleOption: (questionId: string, index: number) => void;
   updateOption: (
     questionId: string,
     index: number,
@@ -30,10 +38,10 @@ function blankQuestion(): EditorQuestion {
     statement: "",
     timeLimit: 20,
     options: [
-      { text: "", points: 100 },
-      { text: "", points: 0 },
-      { text: "", points: 0 },
-      { text: "", points: 0 },
+      { text: "", points: 100, enabled: true },
+      { text: "", points: 0, enabled: true },
+      { text: "", points: 0, enabled: true },
+      { text: "", points: 0, enabled: true },
     ],
   };
 }
@@ -62,22 +70,17 @@ export const useEditorStore = create<EditorState>((set, get) => ({
       questions: s.questions.map((q) => (q.id === id ? { ...q, ...patch } : q)),
     })),
 
-  addOption: (questionId) =>
+  toggleOption: (questionId, index) =>
     set((s) => ({
-      questions: s.questions.map((q) =>
-        q.id === questionId && q.options.length < 4
-          ? { ...q, options: [...q.options, { text: "", points: 0 }] }
-          : q,
-      ),
-    })),
-
-  removeOption: (questionId, index) =>
-    set((s) => ({
-      questions: s.questions.map((q) =>
-        q.id === questionId && q.options.length > 2
-          ? { ...q, options: q.options.filter((_, i) => i !== index) }
-          : q,
-      ),
+      questions: s.questions.map((q) => {
+        if (q.id !== questionId) return q;
+        const options = q.options.map((o, i) =>
+          i === index ? { ...o, enabled: !o.enabled } : o,
+        );
+        const enabledCount = options.filter((o) => o.enabled).length;
+        if (enabledCount < 2) return q;
+        return { ...q, options };
+      }),
     })),
 
   updateOption: (questionId, index, patch) =>
@@ -108,7 +111,7 @@ export const useEditorStore = create<EditorState>((set, get) => ({
         statement: q.statement.trim(),
         timeLimit: q.timeLimit,
         options: q.options
-          .filter((o) => o.text.trim().length > 0)
+          .filter((o) => o.enabled && o.text.trim().length > 0)
           .map((o) => ({ text: o.text.trim(), points: o.points })),
       })),
     };
