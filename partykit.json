@@ -1,6 +1,0 @@
-{
-  "$schema": "https://www.partykit.io/schema.json",
-  "name": "kahuhu",
-  "main": "party/index.ts",
-  "compatibilityDate": "2024-09-01"
-}
