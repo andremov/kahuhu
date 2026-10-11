@@ -1,4 +1,4 @@
-import type * as Party from "partykit/server";
+import { routePartykitRequest, Server, type Connection } from "partyserver";
 import type {
   FinalResults,
   GameState,
@@ -30,7 +30,15 @@ interface ServerPlayer extends Player {
 
 const ACCELERATED_REMAINING_MS = 5000;
 
-export default class GameServer implements Party.Server {
+type Env = { Main: DurableObjectNamespace<GameServer> };
+
+/**
+ * One quiz room, a PartyServer Durable Object (binding `Main` = the default `main` party).
+ * No hibernation: the quiz, players and question timer live in memory while anyone is connected.
+ */
+export class GameServer extends Server<Env> {
+  static options = { hibernate: false };
+
   quiz: Quiz | null = null;
   players: Map<string, ServerPlayer> = new Map();
   hostConnId: string | null = null;
@@ -41,9 +49,7 @@ export default class GameServer implements Party.Server {
   timerHandle: ReturnType<typeof setTimeout> | null = null;
   acceleratedThisQuestion = false;
 
-  constructor(readonly room: Party.Room) {}
-
-  onConnect(conn: Party.Connection) {
+  onConnect(conn: Connection) {
     try {
       if (this.quiz) {
         this.sendTo(conn, { type: "state", state: this.buildSnapshot() });
@@ -53,11 +59,11 @@ export default class GameServer implements Party.Server {
     }
   }
 
-  onError(_conn: Party.Connection, err: Error) {
+  onError(_conn: Connection, err: unknown) {
     console.error("[party] onError:", err);
   }
 
-  onClose(conn: Party.Connection) {
+  onClose(conn: Connection) {
     try {
       const player = this.players.get(conn.id);
       if (!player) return;
@@ -78,7 +84,8 @@ export default class GameServer implements Party.Server {
     }
   }
 
-  onMessage(message: string, conn: Party.Connection) {
+  onMessage(conn: Connection, message: string | ArrayBuffer | ArrayBufferView) {
+    if (typeof message !== "string") return;
     let parsed: ClientMessage;
     try {
       parsed = JSON.parse(message);
@@ -114,7 +121,7 @@ export default class GameServer implements Party.Server {
   }
 
   private handleHostInit(
-    conn: Party.Connection,
+    conn: Connection,
     quiz: Quiz,
     name: string,
     role: "host-tv" | "host-player",
@@ -149,7 +156,7 @@ export default class GameServer implements Party.Server {
     this.broadcastState();
   }
 
-  private handleJoin(conn: Party.Connection, name: string, role: PlayerRole) {
+  private handleJoin(conn: Connection, name: string, role: PlayerRole) {
     if (!this.quiz) {
       this.sendTo(conn, {
         type: "error",
@@ -186,14 +193,14 @@ export default class GameServer implements Party.Server {
     this.broadcastState();
   }
 
-  private handleStart(conn: Party.Connection) {
+  private handleStart(conn: Connection) {
     if (conn.id !== this.hostConnId || !this.quiz) return;
     if (this.gameState !== "lobby") return;
     this.currentQuestionIndex = 0;
     this.beginQuestion();
   }
 
-  private handleAnswer(conn: Party.Connection, answerIndex: number) {
+  private handleAnswer(conn: Connection, answerIndex: number) {
     if (!this.quiz || this.gameState !== "question") return;
     const player = this.players.get(conn.id);
     if (!player) return;
@@ -228,7 +235,7 @@ export default class GameServer implements Party.Server {
     this.broadcastState();
   }
 
-  private handleNext(conn: Party.Connection) {
+  private handleNext(conn: Connection) {
     if (conn.id !== this.hostConnId || !this.quiz) return;
     if (this.gameState !== "results") return;
 
@@ -319,7 +326,7 @@ export default class GameServer implements Party.Server {
         }),
     };
 
-    this.broadcast({
+    this.broadcastMsg({
       type: "question-ended",
       result,
       state: this.buildSnapshot(),
@@ -351,7 +358,7 @@ export default class GameServer implements Party.Server {
       })),
     };
 
-    this.broadcast({
+    this.broadcastMsg({
       type: "final",
       results,
       state: this.buildSnapshot(),
@@ -378,7 +385,7 @@ export default class GameServer implements Party.Server {
         ? Math.max(0, Math.ceil((this.questionEndsAt - Date.now()) / 1000))
         : 0;
     return {
-      code: this.room.id,
+      code: this.name,
       quizTitle: this.quiz?.title ?? "",
       quizDescription: this.quiz?.description ?? "",
       totalQuestions: this.quiz?.questions.length ?? 0,
@@ -400,14 +407,20 @@ export default class GameServer implements Party.Server {
   }
 
   private broadcastState() {
-    this.broadcast({ type: "state", state: this.buildSnapshot() });
+    this.broadcastMsg({ type: "state", state: this.buildSnapshot() });
   }
 
-  private broadcast(msg: ServerMessage) {
-    this.room.broadcast(JSON.stringify(msg));
+  private broadcastMsg(msg: ServerMessage) {
+    this.broadcast(JSON.stringify(msg));
   }
 
-  private sendTo(conn: Party.Connection, msg: ServerMessage) {
+  private sendTo(conn: Connection, msg: ServerMessage) {
     conn.send(JSON.stringify(msg));
   }
 }
+
+export default {
+  async fetch(request: Request, env: Env): Promise<Response> {
+    return (await routePartykitRequest(request, env)) ?? new Response("Not found", { status: 404 });
+  },
+} satisfies ExportedHandler<Env>;

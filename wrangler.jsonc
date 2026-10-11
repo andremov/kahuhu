@@ -1,0 +1,12 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "kahuhu",
+  "account_id": "14934b19def2d070dc088932172bd8b8",
+  "main": "party/index.ts",
+  "compatibility_date": "2026-09-01",
+  // binding "Main" serves the default "main" party: /parties/main/:room
+  "durable_objects": {
+    "bindings": [{ "name": "Main", "class_name": "GameServer" }]
+  },
+  "migrations": [{ "tag": "v1", "new_sqlite_classes": ["GameServer"] }]
+}
