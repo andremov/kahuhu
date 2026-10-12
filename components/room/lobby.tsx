@@ -3,7 +3,7 @@
 import { AnimatePresence, motion } from "framer-motion";
 import { QRCodeSVG } from "qrcode.react";
 import { Check, Copy, Crown, Play, Tv, Users } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useState, useSyncExternalStore } from "react";
 import { Button } from "@/components/ui/button";
 import type { RoomSnapshot } from "@/lib/types";
 import { cn } from "@/lib/utils";
@@ -32,6 +32,8 @@ function colorForId(id: string): string {
   return AVATAR_COLORS[Math.abs(hash) % AVATAR_COLORS.length];
 }
 
+const subscribeNever = () => () => {};
+
 function initials(name: string): string {
   const parts = name.trim().split(/\s+/).slice(0, 2);
   return parts.map((p) => p[0]?.toUpperCase() ?? "").join("") || "?";
@@ -39,14 +41,18 @@ function initials(name: string): string {
 
 export default function Lobby({ state, isHost, onStart }: Props) {
   const [copied, setCopied] = useState(false);
-  const [joinUrl, setJoinUrl] = useState("");
-
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    const url = new URL("/join", window.location.origin);
+  // Browser-only origin: "" on the server and during hydration, so the QR code still appears only after mount.
+  const origin = useSyncExternalStore(
+    subscribeNever,
+    () => window.location.origin,
+    () => "",
+  );
+  let joinUrl = "";
+  if (origin) {
+    const url = new URL("/join", origin);
     url.searchParams.set("code", state.code);
-    setJoinUrl(url.toString());
-  }, [state.code]);
+    joinUrl = url.toString();
+  }
 
   const copy = () => {
     navigator.clipboard.writeText(state.code);

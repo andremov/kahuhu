@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import type { Question, Quiz, QuestionOption } from "./types";
+import type { Quiz, QuestionOption } from "./types";
 import { makeId } from "./score";
 
 interface EditorOption extends QuestionOption {
