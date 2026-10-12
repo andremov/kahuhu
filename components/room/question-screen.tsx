@@ -23,6 +23,7 @@ function useCountdown(endsAt: number | null): number {
   const [now, setNow] = useState(() => Date.now());
   useEffect(() => {
     if (endsAt === null) return;
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- resync the clock the moment a new deadline arrives, so the ring never starts from a stale time
     setNow(Date.now());
     const handle = setInterval(() => setNow(Date.now()), 100);
     return () => clearInterval(handle);
@@ -95,13 +96,13 @@ export default function QuestionScreen({
   myAnswer,
   onAnswer,
 }: Props) {
+  const remaining = useCountdown(state.questionEndsAt);
   const q = state.currentQuestion;
   if (!q) return null;
 
   const isTv = role === "host-tv";
   const disabled = isTv;
   const totalTime = q.timeLimit;
-  const remaining = useCountdown(state.questionEndsAt);
 
   const answeredCount = state.players.filter(
     (p) => p.role !== "host-tv",

@@ -25,6 +25,7 @@ export default function Background() {
     const width = window.innerWidth;
     const height = window.innerHeight;
 
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- random orb positions from the window size exist only in the browser; seeding them after mount keeps server and client HTML identical
     setOrbs(
       Array.from({ length: ORB_COLORS.length }, () => ({
         x: Math.random() * width,

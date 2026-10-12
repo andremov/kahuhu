@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Suspense, useEffect, useState } from "react";
+import { Suspense, useState } from "react";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -11,18 +11,22 @@ import { cn } from "@/lib/utils";
 
 const CODE_LENGTH = 6;
 
+const cleanCode = (raw: string) =>
+  raw.toUpperCase().replace(/[^A-Z0-9]/g, "").slice(0, CODE_LENGTH);
+
 function JoinForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const [code, setCode] = useState("");
+  const prefill = searchParams.get("code");
+  const [code, setCode] = useState(() => (prefill ? cleanCode(prefill) : ""));
   const [name, setName] = useState("");
 
-  useEffect(() => {
-    const prefill = searchParams.get("code");
-    if (prefill) {
-      setCode(prefill.toUpperCase().replace(/[^A-Z0-9]/g, "").slice(0, CODE_LENGTH));
-    }
-  }, [searchParams]);
+  // A ?code= that changes while the form is mounted refills the field (adjust-state-on-prop-change).
+  const [seenPrefill, setSeenPrefill] = useState(prefill);
+  if (prefill !== seenPrefill) {
+    setSeenPrefill(prefill);
+    if (prefill) setCode(cleanCode(prefill));
+  }
 
   const canJoin = code.trim().length >= 4 && name.trim().length > 0;
 
